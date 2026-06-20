@@ -7,12 +7,12 @@ export const learningPaths: LearningPath[] = [
     level: 'CSP-J',
     nodes: [
       {
-        id: 'lpj1',
-        knowledgePointId: 'kp1',
-        order: 1,
-        prerequisites: [],
-        unlockCondition: { minMasteryLevel: 0, requiredProblems: 0 },
-      },
+          id: 'lpj1',
+          knowledgePointId: 'kp1',
+          order: 1,
+          prerequisites: [],
+          unlockCondition: { minMasteryLevel: 0, requiredProblems: 3 },
+        },
       {
         id: 'lpj2',
         knowledgePointId: 'kp2',
