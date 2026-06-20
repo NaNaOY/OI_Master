@@ -7,7 +7,7 @@ import { getKnowledgePointName } from '@/utils/analysis';
 import Editor from '@monaco-editor/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle, Clock, Copy, Lightbulb, RotateCcw, Sparkles, Star, Target, Zap } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const defaultCode = `#include <iostream>
@@ -48,13 +48,13 @@ export const ProblemPage = () => {
   const [showHint, setShowHint] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const timeRef = useRef(0);
   
   useEffect(() => {
+    timeRef.current = 0;
     const timer = setInterval(() => {
-      setElapsedTime(prev => {
-        const next = prev + 1;
-        return next;
-      });
+      timeRef.current += 1;
+      setElapsedTime(timeRef.current);
     }, 1000);
     
     return () => clearInterval(timer);
