@@ -36,7 +36,7 @@ export const Diagnosis = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="p-4 md:p-6 border-t-4 border-primary-600">
+          <Card className="p-4 md:p-6 border-2 border-primary-200">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-primary-100 flex items-center justify-center">
                 <span className="text-primary-600 font-bold text-lg md:text-xl">J</span>
@@ -80,7 +80,7 @@ export const Diagnosis = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="p-4 md:p-6 border-t-4 border-accent-500">
+          <Card className="p-4 md:p-6 border-2 border-accent-200">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-accent-100 flex items-center justify-center">
                 <span className="text-accent-600 font-bold text-lg md:text-xl">S</span>
