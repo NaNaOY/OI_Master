@@ -5,7 +5,7 @@ import type { ProblemRecord } from '@/types/problem';
 import { saveUserData, loadUserData, initializeUserData } from '@/utils/storage';
 import { analyzeDiagnosis, generateDiagnosisRecord, updateLearningProgress, calculateStats } from '@/utils/analysis';
 import { generateUUID } from '@/utils/storage';
-import { getProblemById } from '@/data/problems';
+import { getProblemById, problems } from '@/data/problems';
 
 interface UserState {
   userData: UserLearningData;
@@ -18,6 +18,7 @@ interface UserState {
   addMistake: (problemId: string, code: string, errorType: string, aiAnalysis: string) => void;
   markMistakeReviewed: (mistakeId: string) => void;
   updateStatistics: () => void;
+  updateDailyRecommendations: () => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -141,5 +142,56 @@ export const useUserStore = create<UserState>((set, get) => ({
         statistics: calculateStats(state.userData),
       },
     }));
+  },
+  
+  updateDailyRecommendations: () => {
+    const { learningProgress, mistakes, completedProblems } = get().userData;
+    
+    const weakKnowledgePoints = learningProgress
+      .filter(p => p.masteryLevel < 80)
+      .map(p => p.knowledgePointId);
+    
+    const mistakeKnowledgePoints = [...new Set(
+      mistakes.map(m => {
+        const problem = problems.find(p => p.id === m.problemId);
+        return problem?.knowledgePoints[0];
+      }).filter((k): k is string => !!k)
+    )];
+    
+    const targetKnowledgePoints = [...new Set([...weakKnowledgePoints, ...mistakeKnowledgePoints])];
+    
+    const completedIds = new Set(completedProblems.map(cp => cp.problemId));
+    
+    let recommendedProblems = problems
+      .filter(p => {
+        if (completedIds.has(p.id)) return false;
+        return p.knowledgePoints.some(kp => targetKnowledgePoints.includes(kp));
+      })
+      .sort((a, b) => {
+        const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
+        return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+      });
+    
+    if (recommendedProblems.length < 5) {
+      const additionalProblems = problems
+        .filter(p => !completedIds.has(p.id) && !recommendedProblems.find(rp => rp.id === p.id))
+        .sort((a, b) => {
+          const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
+          return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+        });
+      recommendedProblems = [...recommendedProblems, ...additionalProblems.slice(0, 5 - recommendedProblems.length)];
+    }
+    
+    const todayStr = new Date().toISOString().split('T')[0];
+    
+    set(state => ({
+      userData: {
+        ...state.userData,
+        dailyRecommendedProblems: recommendedProblems.slice(0, 5).map(p => p.id),
+        dailyRecommendDate: todayStr,
+      },
+    }));
+    
+    get().saveUser();
   },
 }));

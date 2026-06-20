@@ -25,6 +25,8 @@ export const initializeUserData = (): UserLearningData => {
     name: '学生',
     createdAt: new Date().toISOString(),
     lastLoginAt: new Date().toISOString(),
+    dailyRecommendedProblems: [],
+    dailyRecommendDate: '',
     diagnosisHistory: [],
     learningProgress: [],
     completedProblems: [],

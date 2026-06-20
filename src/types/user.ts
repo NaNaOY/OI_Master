@@ -14,6 +14,8 @@ export interface UserLearningData {
   name: string;
   createdAt: string;
   lastLoginAt: string;
+  dailyRecommendedProblems: string[];
+  dailyRecommendDate: string;
   diagnosisHistory: {
     id: string;
     date: string;
