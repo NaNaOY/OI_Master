@@ -173,7 +173,7 @@ export const DiagnosisReport = () => {
       
       {/* 图表区域 */}
       <motion.div 
-        className="grid grid-cols-2 gap-6"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
         variants={containerVariants}
       >
         <motion.div variants={itemVariants}>
@@ -324,20 +324,20 @@ export const DiagnosisReport = () => {
           </motion.h3>
           
           <motion.div 
-            className="grid grid-cols-2 gap-5"
+            className="space-y-4"
             variants={containerVariants}
           >
             {sortedKP.map((item) => (
               <motion.div
                 key={item.kpId}
                 variants={itemVariants}
-                whileHover={{ y: -4, scale: 1.01 }}
-                className="p-5 rounded-2xl border border-neutral-100/50 bg-gradient-to-br from-white to-neutral-50/30 group"
+                whileHover={{ y: -2, scale: 1.005 }}
+                className="flex items-center justify-between p-4 rounded-2xl border border-neutral-100/50 bg-gradient-to-r from-white to-neutral-50/30"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-semibold text-neutral-700">{item.kp?.name}</span>
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <span className="font-semibold text-neutral-700 whitespace-nowrap overflow-hidden text-ellipsis">{item.kp?.name}</span>
                   <motion.span
-                    className="text-xs px-3 py-1 rounded-full font-medium"
+                    className="flex-shrink-0 text-xs px-3 py-1 rounded-full font-medium"
                     style={{
                       backgroundColor: `${getMasteryColor(item.score)}15`,
                       color: getMasteryColor(item.score),
@@ -346,20 +346,20 @@ export const DiagnosisReport = () => {
                   >
                     {getMasteryLevel(item.score)}
                   </motion.span>
+                  <div className="flex-1 min-w-0 ml-4">
+                    <ProgressBar
+                      value={item.score}
+                      color={getMasteryColor(item.score)}
+                      className="h-3 rounded-full"
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <ProgressBar
-                    value={item.score}
-                    color={getMasteryColor(item.score)}
-                    className="flex-1 h-3 rounded-full"
-                  />
-                  <motion.span 
-                    className="text-sm font-bold text-neutral-600 w-14 text-right tabular-nums"
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    {item.score}%
-                  </motion.span>
-                </div>
+                <motion.span 
+                  className="flex-shrink-0 text-lg font-bold text-neutral-600 w-16 text-right tabular-nums ml-6"
+                  whileHover={{ scale: 1.1 }}
+                >
+                  {item.score}%
+                </motion.span>
               </motion.div>
             ))}
           </motion.div>
