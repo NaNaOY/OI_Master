@@ -1,13 +1,13 @@
-import { motion } from 'framer-motion';
-import { Lock, CheckCircle, ArrowRight, Target } from 'lucide-react';
-import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
+import { Card } from '@/components/common/Card';
 import { ProgressBar } from '@/components/common/ProgressBar';
-import { useUserStore } from '@/store/useUserStore';
-import { getLearningPathByLevel } from '@/data/learningPath';
 import { getKnowledgePointById } from '@/data/knowledgePoints';
+import { getLearningPathByLevel } from '@/data/learningPath';
 import { getProblemsByKnowledgePoint } from '@/data/problems';
-import { getMasteryColor, getMasteryLevel, getKnowledgePointName } from '@/utils/analysis';
+import { useUserStore } from '@/store/useUserStore';
+import { getKnowledgePointName, getMasteryColor, getMasteryLevel } from '@/utils/analysis';
+import { motion } from 'framer-motion';
+import { ArrowRight, CheckCircle, Lock, Target } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 
 export const LearningPath = () => {
@@ -23,11 +23,30 @@ export const LearningPath = () => {
     return userData.learningProgress.find(p => p.knowledgePointId === kpId);
   };
   
-  const isUnlocked = (_nodeId: string, prerequisites: string[]) => {
+  // 判断知识点是否解锁
+  // 规则：诊断后，如果该知识点在诊断中有得分（或前置知识点已掌握），则解锁
+  const isUnlocked = (nodeIndex: number, prerequisites: string[]) => {
     if (prerequisites.length === 0) return true;
+    
+    // 检查是否有诊断记录
+    const hasDiagnosis = userData.diagnosisHistory.length > 0;
+    
+    // 如果有诊断记录，检查诊断中是否有该知识点的得分
+    if (hasDiagnosis) {
+      const latestDiagnosis = userData.diagnosisHistory[userData.diagnosisHistory.length - 1];
+      const diagnosisScore = latestDiagnosis.scores[learningPath?.nodes[nodeIndex].knowledgePointId || ''];
+      
+      // 如果诊断中有得分（即使是0），说明已经经过诊断，应该解锁
+      if (diagnosisScore !== undefined) {
+        return true;
+      }
+    }
+    
+    // 如果没有诊断记录，按照原来的前置条件判断
     return prerequisites.every(p => {
       const progress = getProgress(p);
-      return progress && progress.completedProblems > 0 && progress.masteryLevel >= 60;
+      // 只要有诊断得分或完成过题目且掌握度>=60%就解锁
+      return progress && (progress.completedProblems > 0 || (progress.masteryLevel >= 60));
     });
   };
   
@@ -71,7 +90,7 @@ export const LearningPath = () => {
           {learningPath.nodes.map((node, index) => {
             const kp = getKnowledgePointById(node.knowledgePointId);
             const progress = getProgress(node.knowledgePointId);
-            const unlocked = isUnlocked(node.id, node.prerequisites);
+            const unlocked = isUnlocked(index, node.prerequisites);
             const mastery = progress?.masteryLevel || 0;
             const completed = progress?.completedProblems || 0;
             const totalProblems = getProblemsByKnowledgePoint(node.knowledgePointId).length;

@@ -7,7 +7,7 @@ export interface LearningResource {
 export interface KnowledgePoint {
   id: string;
   name: string;
-  category: '基础语法' | '数据结构' | '算法' | '数学' | '图论' | '动态规划';
+  category: '程序设计基础' | '基础数据结构' | '基础算法' | '数学基础' | '进阶数据结构' | '进阶算法' | '图论' | '数学进阶';
   description: string;
   prerequisites: string[];
   difficultyLevel: number;

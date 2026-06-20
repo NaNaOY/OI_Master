@@ -1,23 +1,27 @@
-import type { DiagnosisAnswer, DiagnosisResult, DiagnosisRecord } from '@/types/diagnosis';
+import { getDiagnosisQuestionById } from '@/data/diagnosisQuestions';
+import { knowledgePoints } from '@/data/knowledgePoints';
+import { problems } from '@/data/problems';
+import type { DiagnosisAnswer, DiagnosisRecord, DiagnosisResult } from '@/types/diagnosis';
 import type { KnowledgeProgress } from '@/types/knowledge';
 import type { Problem } from '@/types/problem';
 import type { UserLearningData } from '@/types/user';
-import { knowledgePoints } from '@/data/knowledgePoints';
-import { problems } from '@/data/problems';
 
+// 分析诊断答案，计算每个知识点的掌握度
 export const analyzeDiagnosis = (answers: DiagnosisAnswer[]): DiagnosisResult => {
   const knowledgeScores: Record<string, number> = {};
   const totalByKP: Record<string, number> = {};
 
+  // 初始化所有知识点
   knowledgePoints.forEach(kp => {
     knowledgeScores[kp.id] = 0;
     totalByKP[kp.id] = 0;
   });
 
+  // 遍历答案，统计每个知识点的得分
   answers.forEach(answer => {
-    const kpId = answer.questionId.startsWith('dq') 
-      ? knowledgePoints.find(kp => kp.id === answer.questionId.replace('dq', 'kp'))?.id || 'kp1'
-      : 'kp1';
+    // 从诊断题目中获取对应的知识点
+    const diagnosisQuestion = getDiagnosisQuestionById(answer.questionId);
+    const kpId = diagnosisQuestion?.knowledgePoint || 'kp1';
     
     totalByKP[kpId] = (totalByKP[kpId] || 0) + 1;
     if (answer.isCorrect) {
@@ -25,6 +29,7 @@ export const analyzeDiagnosis = (answers: DiagnosisAnswer[]): DiagnosisResult =>
     }
   });
 
+  // 计算每个知识点的掌握度百分比
   const normalizedScores: Record<string, number> = {};
   Object.entries(totalByKP).forEach(([kpId, total]) => {
     if (total > 0) {
@@ -34,10 +39,12 @@ export const analyzeDiagnosis = (answers: DiagnosisAnswer[]): DiagnosisResult =>
     }
   });
 
+  // 找出薄弱知识点（得分低于60%）
   const weakPoints = Object.entries(normalizedScores)
     .filter(([_, score]) => score < 60)
     .map(([id]) => id);
 
+  // 生成学习建议
   const recommendations = weakPoints.map(kpId => {
     const kp = knowledgePoints.find(k => k.id === kpId);
     return kp ? `加强「${kp.name}」的学习` : '';
@@ -46,6 +53,7 @@ export const analyzeDiagnosis = (answers: DiagnosisAnswer[]): DiagnosisResult =>
   return { scores: normalizedScores, weakPoints, recommendations };
 };
 
+// 生成诊断记录
 export const generateDiagnosisRecord = (level: 'CSP-J' | 'CSP-S', result: DiagnosisResult): DiagnosisRecord => {
   return {
     id: `d_${Date.now()}`,
@@ -57,6 +65,7 @@ export const generateDiagnosisRecord = (level: 'CSP-J' | 'CSP-S', result: Diagno
   };
 };
 
+// 更新学习进度
 export const updateLearningProgress = (
   progress: KnowledgeProgress[],
   problem: Problem,
@@ -94,6 +103,7 @@ export const updateLearningProgress = (
   return updatedProgress;
 };
 
+// 每日题目推荐
 export const recommendDailyProblems = (userData: UserLearningData): Problem[] => {
   const { learningProgress, completedProblems, mistakes } = userData;
   
@@ -121,7 +131,7 @@ export const recommendDailyProblems = (userData: UserLearningData): Problem[] =>
       const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
       return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
     });
-  
+
   if (recommendedProblems.length < 5) {
     const additionalProblems = problems
       .filter(p => !completedIds.has(p.id) && !recommendedProblems.find(rp => rp.id === p.id))
@@ -136,6 +146,7 @@ export const recommendDailyProblems = (userData: UserLearningData): Problem[] =>
   return recommendedProblems;
 };
 
+// 计算统计数据
 export const calculateStats = (userData: UserLearningData) => {
   const today = new Date().toISOString().split('T')[0];
   const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -160,28 +171,34 @@ export const calculateStats = (userData: UserLearningData) => {
   };
 };
 
+// 获取知识点名称
 export const getKnowledgePointName = (id: string): string => {
   const kp = knowledgePoints.find(k => k.id === id);
   return kp?.name || id;
 };
 
+// 获取题目标题
 export const getProblemTitle = (id: string): string => {
   const problem = problems.find(p => p.id === id);
   return problem?.title || id;
 };
 
+// 获取分类颜色
 export const getCategoryColor = (category: string): string => {
   const colors: Record<string, string> = {
-    '基础语法': '#3b82f6',
-    '数据结构': '#10b981',
-    '算法': '#f59e0b',
-    '数学': '#8b5cf6',
-    '图论': '#ec4899',
-    '动态规划': '#ef4444',
+    '程序设计基础': '#3b82f6',
+    '基础数据结构': '#10b981',
+    '基础算法': '#f59e0b',
+    '数学基础': '#8b5cf6',
+    '进阶数据结构': '#ec4899',
+    '进阶算法': '#ef4444',
+    '图论': '#14b8a6',
+    '数学进阶': '#a855f7',
   };
   return colors[category] || '#6b7280';
 };
 
+// 获取难度颜色
 export const getDifficultyColor = (difficulty: 'easy' | 'medium' | 'hard'): string => {
   const colors = {
     easy: '#10b981',
@@ -191,6 +208,7 @@ export const getDifficultyColor = (difficulty: 'easy' | 'medium' | 'hard'): stri
   return colors[difficulty];
 };
 
+// 获取掌握度标签
 export const getMasteryLevel = (mastery: number): string => {
   if (mastery >= 90) return '已掌握';
   if (mastery >= 70) return '熟练';
@@ -198,6 +216,7 @@ export const getMasteryLevel = (mastery: number): string => {
   return '薄弱';
 };
 
+// 获取掌握度颜色
 export const getMasteryColor = (mastery: number): string => {
   if (mastery >= 90) return '#10b981';
   if (mastery >= 70) return '#3b82f6';

@@ -1,11 +1,11 @@
-import { create } from 'zustand';
-import type { UserLearningData, MistakeRecord } from '@/types/user';
+import { knowledgePoints } from '@/data/knowledgePoints';
+import { getProblemById, problems } from '@/data/problems';
 import type { DiagnosisAnswer, DiagnosisRecord } from '@/types/diagnosis';
 import type { ProblemRecord } from '@/types/problem';
-import { saveUserData, loadUserData, initializeUserData } from '@/utils/storage';
-import { analyzeDiagnosis, generateDiagnosisRecord, updateLearningProgress, calculateStats } from '@/utils/analysis';
-import { generateUUID } from '@/utils/storage';
-import { getProblemById, problems } from '@/data/problems';
+import type { MistakeRecord, UserLearningData } from '@/types/user';
+import { analyzeDiagnosis, calculateStats, generateDiagnosisRecord, updateLearningProgress } from '@/utils/analysis';
+import { generateUUID, initializeUserData, loadUserData, saveUserData } from '@/utils/storage';
+import { create } from 'zustand';
 
 interface UserState {
   userData: UserLearningData;
@@ -65,10 +65,33 @@ export const useUserStore = create<UserState>((set, get) => ({
     const result = analyzeDiagnosis(answers);
     const record = generateDiagnosisRecord(level, result);
     
+    // 根据诊断结果初始化学习进度
+    const initialLearningProgress = Object.entries(result.scores)
+      .filter(([kpId]) => {
+        // 根据诊断级别筛选知识点
+        const kp = knowledgePoints.find(k => k.id === kpId);
+        if (!kp) return false;
+        
+        // CSP-J: difficultyLevel <= 5
+        // CSP-S: 所有知识点
+        if (level === 'CSP-J') {
+          return kp.difficultyLevel <= 5;
+        }
+        return true;
+      })
+      .map(([kpId, score]) => ({
+        knowledgePointId: kpId,
+        masteryLevel: score,
+        completedProblems: 0,
+        correctProblems: 0,
+        lastPracticeDate: new Date().toISOString(),
+      }));
+    
     set(state => ({
       userData: {
         ...state.userData,
         diagnosisHistory: [...state.userData.diagnosisHistory, record],
+        learningProgress: initialLearningProgress,
       },
     }));
     
