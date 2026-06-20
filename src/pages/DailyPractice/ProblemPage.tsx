@@ -4,7 +4,7 @@ import { Clock, CheckCircle, AlertCircle, Lightbulb, Copy, ArrowLeft, RotateCcw,
 import Editor from '@monaco-editor/react';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
-import { getProblemById, getProblemsByKnowledgePoint, problems } from '@/data/problems';
+import { getProblemById, getProblemsByKnowledgePoint } from '@/data/problems';
 import { getAIResponse, getGenericAIResponse } from '@/data/aiResponses';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useUserStore } from '@/store/useUserStore';
@@ -30,7 +30,7 @@ export const ProblemPage = () => {
   const [showHint, setShowHint] = useState(false);
   const [attempts, setAttempts] = useState(0);
   
-  // 获取下一题
+  // 获取下一题（仅在当前知识点范围内）
   const getNextProblem = () => {
     if (!problem) return null;
     
@@ -41,16 +41,15 @@ export const ProblemPage = () => {
     // 找到当前题目的索引
     const currentIndex = sameKpProblems.findIndex(p => p.id === problem.id);
     
-    // 找下一道未完成的题目
+    // 找下一道未完成的题目（仅在当前知识点内）
     for (let i = currentIndex + 1; i < sameKpProblems.length; i++) {
       if (!completedIds.has(sameKpProblems[i].id)) {
         return sameKpProblems[i];
       }
     }
     
-    // 如果同知识点没有下一题，找其他未完成的题目
-    const allUncompleted = problems.filter(p => !completedIds.has(p.id) && p.id !== problem.id);
-    return allUncompleted.length > 0 ? allUncompleted[0] : null;
+    // 同知识点没有下一题，返回 null
+    return null;
   };
   
   const nextProblem = getNextProblem();

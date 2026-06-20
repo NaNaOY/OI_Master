@@ -153,7 +153,9 @@ export const KnowledgeDetail = () => {
                   </div>
                 </div>
                 {isCompleted ? (
-                  <span className="text-sm text-green-600 font-medium">已完成</span>
+                  <Link to={`/daily/problem/${problem.id}`} className="text-sm text-green-600 font-medium hover:underline">
+                    已完成 ✓
+                  </Link>
                 ) : (
                   <Link to={`/daily/problem/${problem.id}`}>
                     <Button variant="outline" size="sm">

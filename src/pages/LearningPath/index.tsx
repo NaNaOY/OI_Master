@@ -26,7 +26,7 @@ export const LearningPath = () => {
     if (prerequisites.length === 0) return true;
     return prerequisites.every(p => {
       const progress = getProgress(p);
-      return progress && progress.masteryLevel >= 60;
+      return progress && progress.completedProblems > 0 && progress.masteryLevel >= 60;
     });
   };
   
