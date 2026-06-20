@@ -1,4 +1,5 @@
 import { knowledgePoints } from '@/data/knowledgePoints';
+import { getLearningPathByLevel } from '@/data/learningPath';
 import { getProblemById, problems } from '@/data/problems';
 import type { DiagnosisAnswer, DiagnosisRecord } from '@/types/diagnosis';
 import type { ProblemRecord } from '@/types/problem';
@@ -65,23 +66,57 @@ export const useUserStore = create<UserState>((set, get) => ({
     const result = analyzeDiagnosis(answers);
     const record = generateDiagnosisRecord(level, result);
     
-    // 根据诊断结果初始化学习进度
-    const initialLearningProgress = Object.entries(result.scores)
-      .filter(([kpId]) => {
-        // 根据诊断级别筛选知识点
-        const kp = knowledgePoints.find(k => k.id === kpId);
-        if (!kp) return false;
-        
-        // CSP-J: difficultyLevel <= 5
-        // CSP-S: 所有知识点
-        if (level === 'CSP-J') {
-          return kp.difficultyLevel <= 5;
+    // 获取学习路径
+    const learningPath = getLearningPathByLevel(level);
+    
+    // 找出薄弱知识点（得分低于60%）
+    const weakPoints = Object.entries(result.scores)
+      .filter(([_, score]) => score < 60)
+      .map(([kpId]) => kpId);
+    
+    // 确定要解锁的知识点
+    let unlockedKnowledgePoints: string[] = [];
+    
+    if (weakPoints.length <= 3) {
+      // 薄弱点少于等于3个，解锁所有薄弱点及其前置知识点
+      unlockedKnowledgePoints = learningPath?.nodes
+        .map(node => node.knowledgePointId)
+        .filter(kpId => {
+          const kp = knowledgePoints.find(k => k.id === kpId);
+          if (!kp) return false;
+          // CSP-J: difficultyLevel <= 5
+          // CSP-S: 所有知识点
+          if (level === 'CSP-J') {
+            return kp.difficultyLevel <= 5;
+          }
+          return true;
+        }) || [];
+    } else {
+      // 薄弱点超过3个，只解锁学习路径中最靠前的知识点（最多3个）
+      // 按学习路径顺序找出前3个薄弱知识点
+      const orderedWeakPoints: string[] = [];
+      for (const node of learningPath?.nodes || []) {
+        if (weakPoints.includes(node.knowledgePointId)) {
+          orderedWeakPoints.push(node.knowledgePointId);
+          if (orderedWeakPoints.length >= 3) break;
         }
-        return true;
-      })
-      .map(([kpId, score]) => ({
+      }
+      // 解锁这些知识点及其前置知识点
+      for (const node of learningPath?.nodes || []) {
+        if (orderedWeakPoints.includes(node.knowledgePointId)) {
+          break; // 找到目标知识点，停止添加
+        }
+        unlockedKnowledgePoints.push(node.knowledgePointId);
+      }
+      // 添加目标知识点
+      unlockedKnowledgePoints.push(...orderedWeakPoints);
+    }
+    
+    // 根据解锁的知识点初始化学习进度
+    const initialLearningProgress = unlockedKnowledgePoints
+      .map(kpId => ({
         knowledgePointId: kpId,
-        masteryLevel: score,
+        masteryLevel: result.scores[kpId] || 0,
         completedProblems: 0,
         correctProblems: 0,
         lastPracticeDate: new Date().toISOString(),

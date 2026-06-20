@@ -1,6 +1,6 @@
+import { generateDynamicDiagnosisQuestions } from '@/data/diagnosisQuestions';
+import type { DiagnosisAnswer, DiagnosisQuestion } from '@/types/diagnosis';
 import { create } from 'zustand';
-import type { DiagnosisQuestion, DiagnosisAnswer } from '@/types/diagnosis';
-import { getDiagnosisQuestionsByLevel } from '@/data/diagnosisQuestions';
 
 interface DiagnosisState {
   currentLevel: 'CSP-J' | 'CSP-S' | null;
@@ -26,7 +26,8 @@ export const useDiagnosisStore = create<DiagnosisState>((set) => ({
   timeRemaining: 0,
   
   startDiagnosis: (level) => {
-    const questions = getDiagnosisQuestionsByLevel(level);
+    // 使用动态生成的题目，每次诊断题目不同
+    const questions = generateDynamicDiagnosisQuestions(level);
     set({
       currentLevel: level,
       questions,

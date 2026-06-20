@@ -1,11 +1,11 @@
 import type { DiagnosisQuestion } from '@/types/diagnosis';
 
-// NOI大纲配套诊断题目 - 每个知识点都有对应题目
+// NOI大纲配套诊断题目 - 每个知识点有多道题目供随机抽取
 export const diagnosisQuestions: DiagnosisQuestion[] = [
   // ============ CSP-J 入门组 ============
-  // kp1: 程序设计基础
+  // kp1: 程序设计基础 (3道题)
   {
-    id: 'dq1',
+    id: 'dq1-1',
     level: 'CSP-J',
     knowledgePoint: 'kp1',
     difficulty: 'easy',
@@ -16,7 +16,7 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     explanation: 'C++中变量声明需要指定类型，int是正确的整数类型关键字。',
   },
   {
-    id: 'dq2',
+    id: 'dq1-2',
     level: 'CSP-J',
     knowledgePoint: 'kp1',
     difficulty: 'easy',
@@ -26,9 +26,20 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '%是取模运算符，5除以3余2。',
   },
-  // kp2: 条件语句与循环
   {
-    id: 'dq3',
+    id: 'dq1-3',
+    level: 'CSP-J',
+    knowledgePoint: 'kp1',
+    difficulty: 'medium',
+    question: '以下哪个运算符用于逻辑与运算？',
+    type: 'choice',
+    options: ['&', '&&', '|', '||'],
+    correctAnswer: 'B',
+    explanation: '&&是逻辑与运算符，&是位与运算符。',
+  },
+  // kp2: 条件语句与循环 (3道题)
+  {
+    id: 'dq2-1',
     level: 'CSP-J',
     knowledgePoint: 'kp2',
     difficulty: 'easy',
@@ -39,7 +50,7 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     explanation: '循环从i=0开始，当i<5时执行，i=0,1,2,3,4时都会执行，共5次。',
   },
   {
-    id: 'dq4',
+    id: 'dq2-2',
     level: 'CSP-J',
     knowledgePoint: 'kp2',
     difficulty: 'medium',
@@ -49,9 +60,20 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '偶数之和：2+4+6+8+10=30。',
   },
-  // kp3: 函数基础
   {
-    id: 'dq5',
+    id: 'dq2-3',
+    level: 'CSP-J',
+    knowledgePoint: 'kp2',
+    difficulty: 'medium',
+    question: '以下哪种循环结构至少会执行一次循环体？',
+    type: 'choice',
+    options: ['for循环', 'while循环', 'do-while循环', '以上都不是'],
+    correctAnswer: 'C',
+    explanation: 'do-while循环先执行循环体，再判断条件，所以至少执行一次。',
+  },
+  // kp3: 函数基础 (2道题)
+  {
+    id: 'dq3-1',
     level: 'CSP-J',
     knowledgePoint: 'kp3',
     difficulty: 'medium',
@@ -66,9 +88,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '递归函数需要有终止条件（基础情况）和递归步骤（调用自身）。',
   },
-  // kp4: 数组
   {
-    id: 'dq6',
+    id: 'dq3-2',
+    level: 'CSP-J',
+    knowledgePoint: 'kp3',
+    difficulty: 'medium',
+    question: '以下关于函数参数传递的说法正确的是？',
+    type: 'choice',
+    options: [
+      'C++默认使用引用传递',
+      'C++默认使用值传递',
+      'C++不支持引用传递',
+      '函数参数不能是数组',
+    ],
+    correctAnswer: 'B',
+    explanation: 'C++默认使用值传递，函数内部修改参数不影响原变量。',
+  },
+  // kp4: 数组 (3道题)
+  {
+    id: 'dq4-1',
     level: 'CSP-J',
     knowledgePoint: 'kp4',
     difficulty: 'easy',
@@ -79,7 +117,7 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     explanation: 'C++数组下标从0开始。',
   },
   {
-    id: 'dq7',
+    id: 'dq4-2',
     level: 'CSP-J',
     knowledgePoint: 'kp4',
     difficulty: 'medium',
@@ -89,9 +127,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'C',
     explanation: 'a[3]是第4个元素，值为4。',
   },
-  // kp5: 字符串
   {
-    id: 'dq8',
+    id: 'dq4-3',
+    level: 'CSP-J',
+    knowledgePoint: 'kp4',
+    difficulty: 'medium',
+    question: '以下哪种方式可以正确初始化一个二维数组？',
+    type: 'choice',
+    options: [
+      'int a[3][3];',
+      'int a[3,3];',
+      'int a[][] = {{1,2,3}};',
+      'int a(3,3);',
+    ],
+    correctAnswer: 'A',
+    explanation: 'C++二维数组声明需要指定每个维度的大小，格式为int a[行数][列数];',
+  },
+  // kp5: 字符串 (2道题)
+  {
+    id: 'dq5-1',
     level: 'CSP-J',
     knowledgePoint: 'kp5',
     difficulty: 'medium',
@@ -101,9 +155,20 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'D',
     explanation: 'string类型可以使用length()、size()或strlen()获取长度。',
   },
-  // kp6: 排序算法
   {
-    id: 'dq9',
+    id: 'dq5-2',
+    level: 'CSP-J',
+    knowledgePoint: 'kp5',
+    difficulty: 'medium',
+    question: '以下代码输出什么？\nstring s = "hello";\ncout << s[0];',
+    type: 'choice',
+    options: ['h', 'e', 'hello', '0'],
+    correctAnswer: 'A',
+    explanation: 's[0]表示字符串的第一个字符，即"h"。',
+  },
+  // kp6: 排序算法 (2道题)
+  {
+    id: 'dq6-1',
     level: 'CSP-J',
     knowledgePoint: 'kp6',
     difficulty: 'medium',
@@ -113,9 +178,20 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'C',
     explanation: '冒泡排序需要两层循环，时间复杂度为O(n^2)。',
   },
-  // kp7: 查找算法
   {
-    id: 'dq10',
+    id: 'dq6-2',
+    level: 'CSP-J',
+    knowledgePoint: 'kp6',
+    difficulty: 'medium',
+    question: '以下哪种排序算法是稳定的？',
+    type: 'choice',
+    options: ['快速排序', '冒泡排序', '选择排序', '堆排序'],
+    correctAnswer: 'B',
+    explanation: '冒泡排序是稳定排序，相等元素的相对位置不会改变。',
+  },
+  // kp7: 查找算法 (2道题)
+  {
+    id: 'dq7-1',
     level: 'CSP-J',
     knowledgePoint: 'kp7',
     difficulty: 'medium',
@@ -125,9 +201,20 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '二分查找需要数组有序，才能通过比较中间元素缩小搜索范围。',
   },
-  // kp8: 基础数论
   {
-    id: 'dq11',
+    id: 'dq7-2',
+    level: 'CSP-J',
+    knowledgePoint: 'kp7',
+    difficulty: 'medium',
+    question: '二分查找的时间复杂度是多少？',
+    type: 'choice',
+    options: ['O(n)', 'O(n log n)', 'O(log n)', 'O(1)'],
+    correctAnswer: 'C',
+    explanation: '二分查找每次将搜索范围缩小一半，时间复杂度为O(log n)。',
+  },
+  // kp8: 基础数论 (2道题)
+  {
+    id: 'dq8-1',
     level: 'CSP-J',
     knowledgePoint: 'kp8',
     difficulty: 'medium',
@@ -137,9 +224,20 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'C',
     explanation: '只需检查到sqrt(n)即可，因为如果n有因数，必有一个小于等于sqrt(n)。',
   },
-  // kp9: 模拟与枚举
   {
-    id: 'dq12',
+    id: 'dq8-2',
+    level: 'CSP-J',
+    knowledgePoint: 'kp8',
+    difficulty: 'medium',
+    question: '12和18的最大公约数是多少？',
+    type: 'choice',
+    options: ['2', '3', '6', '36'],
+    correctAnswer: 'C',
+    explanation: '12=2×2×3，18=2×3×3，最大公约数为2×3=6。',
+  },
+  // kp9: 模拟与枚举 (2道题)
+  {
+    id: 'dq9-1',
     level: 'CSP-J',
     knowledgePoint: 'kp9',
     difficulty: 'medium',
@@ -154,10 +252,26 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'A',
     explanation: '枚举算法通过逐一列举问题的所有可能情况来找到答案。',
   },
-  // ============ CSP-S 提高组 ============
-  // kp10: 递归与分治
   {
-    id: 'dq13',
+    id: 'dq9-2',
+    level: 'CSP-J',
+    knowledgePoint: 'kp9',
+    difficulty: 'medium',
+    question: '以下哪种情况最适合使用枚举算法？',
+    type: 'choice',
+    options: [
+      '数据量很大且解空间很大',
+      '解空间有限且可以逐一验证',
+      '需要最优解的问题',
+      '需要快速求解的问题',
+    ],
+    correctAnswer: 'B',
+    explanation: '枚举算法适合解空间有限、可以逐一验证的情况。',
+  },
+  // ============ CSP-S 提高组 ============
+  // kp10: 递归与分治 (2道题)
+  {
+    id: 'dq10-1',
     level: 'CSP-S',
     knowledgePoint: 'kp10',
     difficulty: 'medium',
@@ -172,9 +286,20 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '分治算法通常包含：分解（Divide）、解决（Conquer）、合并（Combine）三个步骤。',
   },
-  // kp11: 栈与队列
   {
-    id: 'dq14',
+    id: 'dq10-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp10',
+    difficulty: 'medium',
+    question: '快速排序使用了什么算法思想？',
+    type: 'choice',
+    options: ['贪心', '动态规划', '分治', '回溯'],
+    correctAnswer: 'C',
+    explanation: '快速排序使用分治思想，将数组分成两部分分别排序。',
+  },
+  // kp11: 栈与队列 (2道题)
+  {
+    id: 'dq11-1',
     level: 'CSP-S',
     knowledgePoint: 'kp11',
     difficulty: 'medium',
@@ -184,9 +309,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '栈的LIFO特性适合匹配问题，左括号入栈，右括号时弹出匹配。',
   },
-  // kp12: 链表
   {
-    id: 'dq15',
+    id: 'dq11-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp11',
+    difficulty: 'medium',
+    question: '栈和队列的主要区别是什么？',
+    type: 'choice',
+    options: [
+      '栈是先进先出，队列是先进后出',
+      '栈是先进后出，队列是先进先出',
+      '栈只能存储整数，队列可以存储任意类型',
+      '栈和队列没有区别',
+    ],
+    correctAnswer: 'B',
+    explanation: '栈是先进后出（LIFO），队列是先进先出（FIFO）。',
+  },
+  // kp12: 链表 (2道题)
+  {
+    id: 'dq12-1',
     level: 'CSP-S',
     knowledgePoint: 'kp12',
     difficulty: 'medium',
@@ -201,9 +342,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '删除节点需要修改前驱节点的next指针，使其指向被删除节点的下一个节点。',
   },
-  // kp13: 二叉树
   {
-    id: 'dq16',
+    id: 'dq12-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp12',
+    difficulty: 'medium',
+    question: '链表相比数组的主要优势是什么？',
+    type: 'choice',
+    options: [
+      '访问速度更快',
+      '插入和删除操作更高效',
+      '占用内存更少',
+      '支持随机访问',
+    ],
+    correctAnswer: 'B',
+    explanation: '链表插入和删除只需修改指针，时间复杂度O(1)，而数组需要移动元素。',
+  },
+  // kp13: 二叉树 (2道题)
+  {
+    id: 'dq13-1',
     level: 'CSP-S',
     knowledgePoint: 'kp13',
     difficulty: 'medium',
@@ -213,9 +370,20 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '前序遍历顺序是：先访问根节点，再遍历左子树，最后遍历右子树。',
   },
-  // kp14: 图的基础
   {
-    id: 'dq17',
+    id: 'dq13-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp13',
+    difficulty: 'medium',
+    question: '一个有n个节点的完全二叉树，其高度是多少？',
+    type: 'choice',
+    options: ['n', 'log n', 'log(n+1)', 'n/2'],
+    correctAnswer: 'C',
+    explanation: '完全二叉树的高度为log(n+1)向下取整。',
+  },
+  // kp14: 图的基础 (2道题)
+  {
+    id: 'dq14-1',
     level: 'CSP-S',
     knowledgePoint: 'kp14',
     difficulty: 'medium',
@@ -230,9 +398,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'A',
     explanation: 'DFS使用栈（递归实现隐式使用栈），BFS使用队列来按层次遍历图。',
   },
-  // kp15: 最短路径
   {
-    id: 'dq18',
+    id: 'dq14-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp14',
+    difficulty: 'medium',
+    question: '图的邻接矩阵存储方式适合什么类型的图？',
+    type: 'choice',
+    options: [
+      '稀疏图',
+      '稠密图',
+      '有向图',
+      '无向图',
+    ],
+    correctAnswer: 'B',
+    explanation: '邻接矩阵适合稠密图，空间复杂度O(n^2)，稀疏图浪费空间。',
+  },
+  // kp15: 最短路径 (2道题)
+  {
+    id: 'dq15-1',
     level: 'CSP-S',
     knowledgePoint: 'kp15',
     difficulty: 'hard',
@@ -242,9 +426,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: 'Dijkstra算法用于求解图中从起点到其他所有节点的最短路径。',
   },
-  // kp16: 最小生成树
   {
-    id: 'dq19',
+    id: 'dq15-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp15',
+    difficulty: 'hard',
+    question: 'Dijkstra算法不能处理哪种情况？',
+    type: 'choice',
+    options: [
+      '无权图',
+      '正权图',
+      '负权边',
+      '有向图',
+    ],
+    correctAnswer: 'C',
+    explanation: 'Dijkstra算法不能处理负权边，负权边需要使用Bellman-Ford算法。',
+  },
+  // kp16: 最小生成树 (2道题)
+  {
+    id: 'dq16-1',
     level: 'CSP-S',
     knowledgePoint: 'kp16',
     difficulty: 'hard',
@@ -254,9 +454,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'C',
     explanation: 'Kruskal算法使用并查集来判断加入的边是否连接了相同的连通分量（是否成环）。',
   },
-  // kp17: 动态规划
   {
-    id: 'dq20',
+    id: 'dq16-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp16',
+    difficulty: 'hard',
+    question: 'Prim算法和Kruskal算法的主要区别是什么？',
+    type: 'choice',
+    options: [
+      'Prim适合稀疏图，Kruskal适合稠密图',
+      'Prim从点出发，Kruskal从边出发',
+      'Prim用并查集，Kruskal用堆',
+      '两者完全相同',
+    ],
+    correctAnswer: 'B',
+    explanation: 'Prim算法从点出发逐步扩展，Kruskal算法从边出发按权重排序选择。',
+  },
+  // kp17: 动态规划 (2道题)
+  {
+    id: 'dq17-1',
     level: 'CSP-S',
     knowledgePoint: 'kp17',
     difficulty: 'hard',
@@ -271,9 +487,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '状态转移方程描述了如何从子问题的解推导出原问题的解。',
   },
-  // kp18: 贪心算法
   {
-    id: 'dq21',
+    id: 'dq17-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp17',
+    difficulty: 'hard',
+    question: '动态规划与分治的主要区别是什么？',
+    type: 'choice',
+    options: [
+      '动态规划没有子问题',
+      '动态规划有重叠子问题，分治没有',
+      '分治更高效',
+      '动态规划只能用于数学问题',
+    ],
+    correctAnswer: 'B',
+    explanation: '动态规划适用于有重叠子问题的情况，通过记忆化避免重复计算。',
+  },
+  // kp18: 贪心算法 (2道题)
+  {
+    id: 'dq18-1',
     level: 'CSP-S',
     knowledgePoint: 'kp18',
     difficulty: 'hard',
@@ -288,9 +520,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '贪心算法适用于局部最优选择能导致全局最优的问题，如活动选择、Huffman编码等。',
   },
-  // kp19: 搜索与剪枝
   {
-    id: 'dq22',
+    id: 'dq18-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp18',
+    difficulty: 'hard',
+    question: '以下哪个问题可以用贪心算法解决？',
+    type: 'choice',
+    options: [
+      '背包问题（物品可分割）',
+      '0-1背包问题',
+      '最长路径问题',
+      '所有问题',
+    ],
+    correctAnswer: 'A',
+    explanation: '背包问题（物品可分割）可以用贪心算法，按单位价值排序选择。',
+  },
+  // kp19: 搜索与剪枝 (2道题)
+  {
+    id: 'dq19-1',
     level: 'CSP-S',
     knowledgePoint: 'kp19',
     difficulty: 'hard',
@@ -305,9 +553,25 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '剪枝通过排除不可能产生最优解的分支，减少搜索空间，提高搜索效率。',
   },
-  // kp20: 组合数学基础
   {
-    id: 'dq23',
+    id: 'dq19-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp19',
+    difficulty: 'hard',
+    question: '以下哪种剪枝策略最常用？',
+    type: 'choice',
+    options: [
+      '随机剪枝',
+      '可行性剪枝和最优性剪枝',
+      '全量剪枝',
+      '无剪枝',
+    ],
+    correctAnswer: 'B',
+    explanation: '可行性剪枝排除不满足条件的分支，最优性剪枝排除不可能更优的分支。',
+  },
+  // kp20: 组合数学基础 (2道题)
+  {
+    id: 'dq20-1',
     level: 'CSP-S',
     knowledgePoint: 'kp20',
     difficulty: 'hard',
@@ -322,17 +586,56 @@ export const diagnosisQuestions: DiagnosisQuestion[] = [
     correctAnswer: 'B',
     explanation: '排列数A(n,m) = n!/(n-m)!，组合数C(n,m) = n!/m!(n-m)!。',
   },
+  {
+    id: 'dq20-2',
+    level: 'CSP-S',
+    knowledgePoint: 'kp20',
+    difficulty: 'hard',
+    question: '容斥原理用于解决什么类型的问题？',
+    type: 'choice',
+    options: [
+      '排序问题',
+      '计数问题',
+      '查找问题',
+      '优化问题',
+    ],
+    correctAnswer: 'B',
+    explanation: '容斥原理用于解决计数问题，计算多个集合的并集元素个数。',
+  },
 ];
 
+// 获取某个级别的所有诊断题目
 export const getDiagnosisQuestionsByLevel = (level: 'CSP-J' | 'CSP-S'): DiagnosisQuestion[] => {
   return diagnosisQuestions.filter(q => q.level === level);
+};
+
+// 获取某个知识点的诊断题目
+export const getDiagnosisQuestionsByKnowledgePoint = (kpId: string): DiagnosisQuestion[] => {
+  return diagnosisQuestions.filter(q => q.knowledgePoint === kpId);
 };
 
 export const getDiagnosisQuestionById = (id: string): DiagnosisQuestion | undefined => {
   return diagnosisQuestions.find(q => q.id === id);
 };
 
-// 获取某个知识点的诊断题目
-export const getDiagnosisQuestionsByKnowledgePoint = (kpId: string): DiagnosisQuestion[] => {
-  return diagnosisQuestions.filter(q => q.knowledgePoint === kpId);
+// 动态生成诊断题目：每个知识点随机抽取1道题，然后随机排序
+export const generateDynamicDiagnosisQuestions = (level: 'CSP-J' | 'CSP-S'): DiagnosisQuestion[] => {
+  const allQuestions = getDiagnosisQuestionsByLevel(level);
+  
+  // 获取该级别的所有知识点
+  const knowledgePoints = [...new Set(allQuestions.map(q => q.knowledgePoint))];
+  
+  // 每个知识点随机抽取1道题
+  const selectedQuestions: DiagnosisQuestion[] = [];
+  for (const kpId of knowledgePoints) {
+    const kpQuestions = allQuestions.filter(q => q.knowledgePoint === kpId);
+    if (kpQuestions.length > 0) {
+      // 随机选择一道题
+      const randomIndex = Math.floor(Math.random() * kpQuestions.length);
+      selectedQuestions.push(kpQuestions[randomIndex]);
+    }
+  }
+  
+  // 随机排序题目
+  return selectedQuestions.sort(() => Math.random() - 0.5);
 };
