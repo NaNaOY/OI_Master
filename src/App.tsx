@@ -13,41 +13,14 @@ import { ParentReport } from '@/pages/ParentReport';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
-// 页面切换动画变体
 const pageVariants = {
-  initial: {
-    opacity: 0,
-    x: 20,
-    scale: 0.98,
-  },
-  animate: {
-    opacity: 1,
-    x: 0,
-    scale: 1,
-    transition: {
-      duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
-  exit: {
-    opacity: 0,
-    x: -20,
-    scale: 0.98,
-    transition: {
-      duration: 0.3,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.2 } },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
 };
 
-// 带动画的页面包装器
 const AnimatedPage = ({ children }: { children: React.ReactNode }) => (
-  <motion.div
-    variants={pageVariants}
-    initial="initial"
-    animate="animate"
-    exit="exit"
-  >
+  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
     {children}
   </motion.div>
 );

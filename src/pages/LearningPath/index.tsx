@@ -23,29 +23,22 @@ export const LearningPath = () => {
     return userData.learningProgress.find(p => p.knowledgePointId === kpId);
   };
   
-  // 判断知识点是否解锁
-  // 规则：诊断后，如果该知识点在诊断中有得分（或前置知识点已掌握），则解锁
   const isUnlocked = (nodeIndex: number, prerequisites: string[]) => {
     if (prerequisites.length === 0) return true;
     
-    // 检查是否有诊断记录
     const hasDiagnosis = userData.diagnosisHistory.length > 0;
     
-    // 如果有诊断记录，检查诊断中是否有该知识点的得分
     if (hasDiagnosis) {
       const latestDiagnosis = userData.diagnosisHistory[userData.diagnosisHistory.length - 1];
       const diagnosisScore = latestDiagnosis.scores[learningPath?.nodes[nodeIndex].knowledgePointId || ''];
       
-      // 如果诊断中有得分（即使是0），说明已经经过诊断，应该解锁
       if (diagnosisScore !== undefined) {
         return true;
       }
     }
     
-    // 如果没有诊断记录，按照原来的前置条件判断
     return prerequisites.every(p => {
       const progress = getProgress(p);
-      // 只要有诊断得分或完成过题目且掌握度>=60%就解锁
       return progress && (progress.completedProblems > 0 || (progress.masteryLevel >= 60));
     });
   };
@@ -53,7 +46,7 @@ export const LearningPath = () => {
   if (!learningPath) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">学习路径加载失败</p>
+        <p className="text-neutral-500">学习路径加载失败</p>
       </div>
     );
   }
@@ -62,12 +55,12 @@ export const LearningPath = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">学习路径</h1>
-          <p className="text-gray-500 mt-1">{learningPath.name}</p>
+          <h1 className="text-2xl font-bold text-neutral-800">学习路径</h1>
+          <p className="text-neutral-500 mt-1">{learningPath.name}</p>
         </div>
         <div className="flex gap-2">
           <Link to="/learning-path/CSP-J">
@@ -83,10 +76,10 @@ export const LearningPath = () => {
         </div>
       </div>
       
-      <div className="relative mb-6 md:mb-8">
-        <div className="absolute left-4 top-0 bottom-0 w-1 bg-gray-200" />
+      <div className="relative mb-6">
+        <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-neutral-200 rounded" />
         
-        <div className="space-y-4 md:space-y-6">
+        <div className="space-y-4">
           {learningPath.nodes.map((node, index) => {
             const kp = getKnowledgePointById(node.knowledgePointId);
             const progress = getProgress(node.knowledgePointId);
@@ -98,55 +91,51 @@ export const LearningPath = () => {
             return (
               <motion.div
                 key={node.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="relative pl-12 md:pl-16"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="relative pl-12"
               >
                 <div
-                  className={`absolute left-2 md:left-4 w-4 md:w-5 h-4 md:h-5 rounded-full flex items-center justify-center ${
+                  className={`absolute left-3 top-5 w-5 h-5 rounded-full flex items-center justify-center ${
                     mastery >= 90
                       ? 'bg-green-500 text-white'
                       : unlocked
                       ? 'bg-primary-500 text-white'
-                      : 'bg-gray-300 text-gray-500'
+                      : 'bg-neutral-200 text-neutral-400'
                   }`}
                 >
                   {mastery >= 90 ? (
-                    <CheckCircle size={10} />
+                    <CheckCircle size={12} />
                   ) : unlocked ? (
                     <span className="text-xs font-bold">{index + 1}</span>
                   ) : (
-                    <Lock size={8} />
+                    <Lock size={10} />
                   )}
                 </div>
                 
-                <Card className={`p-4 md:p-5 ${!unlocked ? 'opacity-60' : ''}`}>
+                <Card className={`p-5 ${!unlocked ? 'opacity-60' : ''} hover:shadow-card-hover transition-shadow`}>
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-gray-800">{kp?.name}</h3>
+                        <h3 className="font-semibold text-neutral-800">{kp?.name}</h3>
                         {unlocked && (
                           <span
-                            className="text-xs px-2 py-0.5 rounded-full"
-                            style={{
-                              backgroundColor: `${getMasteryColor(mastery)}15`,
-                              color: getMasteryColor(mastery),
-                            }}
+                            className="text-xs px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600"
                           >
                             {getMasteryLevel(mastery)}
                           </span>
                         )}
                       </div>
                       
-                      <p className="text-sm text-gray-500 mb-3">{kp?.description}</p>
+                      <p className="text-sm text-neutral-500 mb-3">{kp?.description}</p>
                       
                       {unlocked ? (
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                           <div className="flex-1 w-full">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-gray-500">掌握度</span>
-                              <span className="text-xs font-medium">{mastery}%</span>
+                              <span className="text-xs text-neutral-500">掌握度</span>
+                              <span className="text-xs font-medium text-neutral-700">{mastery}%</span>
                             </div>
                             <ProgressBar
                               value={mastery}
@@ -154,15 +143,15 @@ export const LearningPath = () => {
                               height={6}
                             />
                           </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-gray-700">
+                          <div className="text-right whitespace-nowrap">
+                            <p className="text-sm font-medium text-neutral-700">
                               {completed}/{totalProblems} 题
                             </p>
-                            <p className="text-xs text-gray-500">完成进度</p>
+                            <p className="text-xs text-neutral-500">完成进度</p>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
                           <Lock size={14} />
                           <span>需要先掌握：{node.prerequisites.map(p => getKnowledgePointName(p)).join('、')}</span>
                         </div>
@@ -185,23 +174,23 @@ export const LearningPath = () => {
         </div>
       </div>
       
-      <Card className="p-4 md:p-6">
-        <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      <Card className="p-5">
+        <h3 className="font-semibold text-neutral-800 mb-4 flex items-center gap-2">
           <Target size={20} />
           学习建议
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-blue-50 rounded-lg">
+          <div className="p-4 bg-blue-50 rounded-xl">
             <p className="font-medium text-blue-800 mb-1">按顺序学习</p>
             <p className="text-sm text-blue-600">建议按照路径顺序学习，每个知识点掌握后再进入下一个</p>
           </div>
-          <div className="p-4 bg-green-50 rounded-lg">
+          <div className="p-4 bg-green-50 rounded-xl">
             <p className="font-medium text-green-800 mb-1">多做练习</p>
-            <p className="text-sm text-green-600">每个知识点至少完成{learningPath.nodes[0].unlockCondition.requiredProblems}道练习题</p>
+            <p className="text-sm text-green-600">每个知识点至少完成练习题，巩固所学知识</p>
           </div>
-          <div className="p-4 bg-accent-50 rounded-lg">
-            <p className="font-medium text-accent-800 mb-1">定期回顾</p>
-            <p className="text-sm text-accent-600">薄弱知识点建议每周回顾一次，巩固记忆</p>
+          <div className="p-4 bg-amber-50 rounded-xl">
+            <p className="font-medium text-amber-800 mb-1">定期回顾</p>
+            <p className="text-sm text-amber-600">薄弱知识点建议每周回顾一次，巩固记忆</p>
           </div>
         </div>
       </Card>
