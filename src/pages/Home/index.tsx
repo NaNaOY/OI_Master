@@ -51,7 +51,7 @@ export const Home = () => {
             <h1 className="text-2xl md:text-3xl font-bold mb-2">欢迎回来，{userData.name}</h1>
             <p className="text-white/80 mb-6">今天也要继续加油，离目标更近一步！</p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" onClick={() => navigate('/diagnosis')}>
+              <Button size="lg" className="border-2 border-white/30" onClick={() => navigate('/diagnosis')}>
                 <BarChart3 className="mr-2" size={20} />
                 开始诊断
               </Button>
