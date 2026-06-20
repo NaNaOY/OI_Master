@@ -47,6 +47,21 @@ export const ProblemPage = () => {
   const [status, setStatus] = useState<'idle' | 'running' | 'accepted' | 'wrong_answer' | 'runtime_error'>('idle');
   const [showHint, setShowHint] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsedTime(prev => prev + 1);
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+  
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
   
   const getNextProblem = () => {
     if (!problem) return null;
@@ -184,7 +199,8 @@ export const ProblemPage = () => {
             >
               <Clock size={18} />
             </motion.div>
-            <span className="font-medium">{problem.timeLimit / 1000}秒</span>
+            <span className="font-medium">{formatTime(elapsedTime)}</span>
+            <span className="text-xs text-neutral-400 ml-2">限时 {problem.timeLimit / 1000}秒</span>
           </motion.div>
           <motion.div 
             className="text-sm text-neutral-500 font-medium px-4 py-1.5 rounded-full bg-neutral-100"
