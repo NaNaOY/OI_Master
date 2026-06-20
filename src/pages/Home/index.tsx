@@ -5,7 +5,7 @@ import { Button } from '@/components/common/Button';
 import { ProgressBar } from '@/components/common/ProgressBar';
 import { useUserStore } from '@/store/useUserStore';
 import { getKnowledgePointName, getMasteryLevel, getMasteryColor } from '@/utils/analysis';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const statCards = [
   { icon: <Target size={24} />, label: '已完成题目', color: '#3b82f6' },
@@ -23,6 +23,7 @@ const quickActions = [
 
 export const Home = () => {
   const { userData } = useUserStore();
+  const navigate = useNavigate();
   
   const stats = {
     completedProblems: userData.completedProblems.length,
@@ -50,11 +51,11 @@ export const Home = () => {
             <h1 className="text-2xl md:text-3xl font-bold mb-2">欢迎回来，{userData.name}</h1>
             <p className="text-white/80 mb-6">今天也要继续加油，离目标更近一步！</p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg">
+              <Button size="lg" onClick={() => navigate('/diagnosis')}>
                 <BarChart3 className="mr-2" size={20} />
                 开始诊断
               </Button>
-              <Button variant="outline" size="lg" className="text-white border-white hover:bg-white/10">
+              <Button variant="outline" size="lg" className="text-white border-white hover:bg-white/10" onClick={() => navigate('/daily')}>
                 <BookOpen className="mr-2" size={20} />
                 继续学习
               </Button>

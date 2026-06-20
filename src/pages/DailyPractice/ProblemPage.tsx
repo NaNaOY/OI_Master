@@ -43,9 +43,29 @@ export const ProblemPage = () => {
     setTimeout(() => {
       setAttempts(prev => prev + 1);
       
-      const isCorrect = Math.random() > 0.3;
+      const trimmedCode = code.trim();
+      const hasCustomCode = trimmedCode.length > defaultCode.length * 1.2 || 
+        (trimmedCode.includes('cin') && trimmedCode.includes('cout')) ||
+        trimmedCode.includes('for') || trimmedCode.includes('while') ||
+        trimmedCode.includes('if') || trimmedCode.includes('sort') ||
+        trimmedCode.includes('swap') || trimmedCode.includes('arr');
       
-      if (isCorrect) {
+      const isCorrect = hasCustomCode && Math.random() > 0.4;
+      
+      if (!hasCustomCode) {
+        setStatus('wrong_answer');
+        setOutput('答案错误！\n\n测试用例1: 失败\n测试用例2: 失败\n测试用例3: 失败\n\n原因: 代码没有实现有效的逻辑，请完成题目要求的功能。');
+        
+        const kpId = problem!.knowledgePoints[0];
+        const aiResponse = getAIResponse('wrong_answer', kpId) || getGenericAIResponse('wrong_answer');
+        
+        addMistake(
+          problem!.id,
+          code,
+          'wrong_answer',
+          aiResponse?.analysis.rootCause || '代码缺少核心逻辑实现，请根据题目要求编写代码。'
+        );
+      } else if (isCorrect) {
         setStatus('accepted');
         setOutput('所有测试用例通过！\n\n测试用例1: 通过\n测试用例2: 通过\n测试用例3: 通过');
         
