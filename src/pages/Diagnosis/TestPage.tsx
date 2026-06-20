@@ -40,6 +40,7 @@ export const DiagnosisTest = () => {
   const { questions, currentQuestionIndex, answers, submitAnswer, prevQuestion, nextQuestion, completeDiagnosis: resetDiagnosis } = useDiagnosisStore();
   const { completeDiagnosis } = useUserStore();
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [elapsedTime, setElapsedTime] = useState(0);
   
   const currentQuestion = questions[currentQuestionIndex];
   
@@ -56,6 +57,14 @@ export const DiagnosisTest = () => {
       setSelectedAnswer('');
     }
   }, [currentQuestionIndex, questions, level, navigate, answers]);
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsedTime(prev => prev + 1);
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
   
   const handleSelectOption = (option: string) => {
     setSelectedAnswer(option);
@@ -171,7 +180,7 @@ export const DiagnosisTest = () => {
           >
             <Clock size={20} className="text-neutral-500" />
           </motion.div>
-          <span className="font-semibold text-neutral-600">{formatTime(0)}</span>
+          <span className="font-semibold text-neutral-600">{formatTime(elapsedTime)}</span>
         </motion.div>
       </motion.div>
       
