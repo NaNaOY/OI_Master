@@ -51,13 +51,16 @@ export const ProblemPage = () => {
   
   useEffect(() => {
     const timer = setInterval(() => {
-      setElapsedTime(prev => prev + 1);
+      setElapsedTime(prev => {
+        const next = prev + 1;
+        return next;
+      });
     }, 1000);
     
     return () => clearInterval(timer);
   }, []);
   
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
