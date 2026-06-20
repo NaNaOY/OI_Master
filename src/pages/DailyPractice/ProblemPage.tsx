@@ -203,7 +203,6 @@ export const ProblemPage = () => {
               <Clock size={18} />
             </motion.div>
             <span className="font-medium">{formatTime(elapsedTime)}</span>
-            <span className="text-xs text-neutral-400 ml-2">限时 {problem.timeLimit / 1000}秒</span>
           </motion.div>
           <motion.div 
             className="text-sm text-neutral-500 font-medium px-4 py-1.5 rounded-full bg-neutral-100"
