@@ -39,26 +39,33 @@ export const ProblemPage = () => {
   const simulateCodeRun = () => {
     setStatus('running');
     setOutput('');
-    
+
     setTimeout(() => {
       setAttempts(prev => prev + 1);
-      
+
       const trimmedCode = code.trim();
-      const hasCustomCode = trimmedCode.length > defaultCode.length * 1.2 || 
-        (trimmedCode.includes('cin') && trimmedCode.includes('cout')) ||
-        trimmedCode.includes('for') || trimmedCode.includes('while') ||
-        trimmedCode.includes('if') || trimmedCode.includes('sort') ||
-        trimmedCode.includes('swap') || trimmedCode.includes('arr');
-      
+      const codeLines = trimmedCode.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const bodyLines = codeLines.filter(l => !l.startsWith('#') && !l.startsWith('//') && !l.startsWith('using'));
+      const mainBody = bodyLines.slice(bodyLines.indexOf('int main() {') + 1, bodyLines.lastIndexOf('}'));
+      const meaningfulLines = mainBody.filter(l => l !== '' && l !== 'return 0;' && !l.startsWith('//'));
+
+      const hasInput = trimmedCode.includes('cin >>');
+      const hasOutput = trimmedCode.includes('cout <<');
+      const hasLoop = trimmedCode.includes('for (') || trimmedCode.includes('while (');
+      const hasCondition = trimmedCode.includes('if (');
+      const hasLogic = trimmedCode.includes('sort(') || trimmedCode.includes('swap(') || trimmedCode.includes('+') || trimmedCode.includes('-') || trimmedCode.includes('*') || trimmedCode.includes('/');
+
+      const hasCustomCode = meaningfulLines.length >= 3 && (hasInput || hasOutput || hasLoop || hasCondition || hasLogic);
+
       const isCorrect = hasCustomCode && Math.random() > 0.4;
-      
+
       if (!hasCustomCode) {
         setStatus('wrong_answer');
         setOutput('答案错误！\n\n测试用例1: 失败\n测试用例2: 失败\n测试用例3: 失败\n\n原因: 代码没有实现有效的逻辑，请完成题目要求的功能。');
-        
+
         const kpId = problem!.knowledgePoints[0];
         const aiResponse = getAIResponse('wrong_answer', kpId) || getGenericAIResponse('wrong_answer');
-        
+
         addMistake(
           problem!.id,
           code,
@@ -68,7 +75,7 @@ export const ProblemPage = () => {
       } else if (isCorrect) {
         setStatus('accepted');
         setOutput('所有测试用例通过！\n\n测试用例1: 通过\n测试用例2: 通过\n测试用例3: 通过');
-        
+
         addProblemRecord({
           problemId: problem!.id,
           completedAt: new Date().toISOString(),
@@ -80,16 +87,16 @@ export const ProblemPage = () => {
       } else {
         const errorType = Math.random() > 0.5 ? 'wrong_answer' : 'runtime_error';
         setStatus(errorType === 'wrong_answer' ? 'wrong_answer' : 'runtime_error');
-        
+
         if (errorType === 'wrong_answer') {
           setOutput('答案错误！\n\n测试用例1: 通过\n测试用例2: 失败\n期望输出: 10\n实际输出: 8');
         } else {
           setOutput('运行时错误！\n\n程序在执行过程中崩溃，请检查数组越界、空指针等问题。');
         }
-        
+
         const kpId = problem!.knowledgePoints[0];
         const aiResponse = getAIResponse(errorType, kpId) || getGenericAIResponse(errorType);
-        
+
         addMistake(
           problem!.id,
           code,
