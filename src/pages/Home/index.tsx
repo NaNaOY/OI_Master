@@ -187,15 +187,10 @@ export const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
               >
-                <motion.div 
-                  whileHover={{ scale: 1.05, y: -2 }} 
-                  whileTap={{ scale: 0.98 }}
-                  className="relative"
-                >
-                  <div className="absolute inset-0 bg-white/20 rounded-xl blur-xl" />
+                <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button 
                     size="lg" 
-                    className="relative bg-white text-primary-700 hover:bg-white/95 shadow-xl px-10 py-4 rounded-xl font-semibold"
+                    className="bg-white text-primary-700 hover:bg-white/95 shadow-xl px-10 py-4 rounded-xl font-semibold"
                     onClick={() => navigate('/diagnosis')}
                   >
                     <motion.div
