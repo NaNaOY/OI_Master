@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Clock, CheckCircle, AlertCircle, Lightbulb, Copy, ArrowLeft, RotateCcw } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, Lightbulb, Copy, ArrowLeft, RotateCcw, ArrowRight } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
-import { getProblemById } from '@/data/problems';
+import { getProblemById, getProblemsByKnowledgePoint, problems } from '@/data/problems';
 import { getAIResponse, getGenericAIResponse } from '@/data/aiResponses';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useUserStore } from '@/store/useUserStore';
@@ -21,7 +21,7 @@ int main() {
 export const ProblemPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addProblemRecord, addMistake } = useUserStore();
+  const { addProblemRecord, addMistake, userData } = useUserStore();
   
   const problem = getProblemById(id || '');
   const [code, setCode] = useState(defaultCode);
@@ -29,6 +29,31 @@ export const ProblemPage = () => {
   const [status, setStatus] = useState<'idle' | 'running' | 'accepted' | 'wrong_answer' | 'runtime_error'>('idle');
   const [showHint, setShowHint] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  
+  // 获取下一题
+  const getNextProblem = () => {
+    if (!problem) return null;
+    
+    // 获取同知识点的题目
+    const sameKpProblems = getProblemsByKnowledgePoint(problem.knowledgePoints[0]);
+    const completedIds = new Set(userData.completedProblems.map(cp => cp.problemId));
+    
+    // 找到当前题目的索引
+    const currentIndex = sameKpProblems.findIndex(p => p.id === problem.id);
+    
+    // 找下一道未完成的题目
+    for (let i = currentIndex + 1; i < sameKpProblems.length; i++) {
+      if (!completedIds.has(sameKpProblems[i].id)) {
+        return sameKpProblems[i];
+      }
+    }
+    
+    // 如果同知识点没有下一题，找其他未完成的题目
+    const allUncompleted = problems.filter(p => !completedIds.has(p.id) && p.id !== problem.id);
+    return allUncompleted.length > 0 ? allUncompleted[0] : null;
+  };
+  
+  const nextProblem = getNextProblem();
   
   useEffect(() => {
     if (!problem) {
@@ -290,6 +315,27 @@ export const ProblemPage = () => {
                     <Link to="/mistakes">
                       <Button variant="outline" size="sm" className="w-full">
                         查看AI归因分析
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+                
+                {status === 'accepted' && nextProblem && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <Link to={`/daily/problem/${nextProblem.id}`}>
+                      <Button size="sm" className="w-full">
+                        下一题：{nextProblem.title}
+                        <ArrowRight size={16} className="ml-1" />
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+                
+                {status === 'accepted' && !nextProblem && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <Link to="/daily">
+                      <Button variant="outline" size="sm" className="w-full">
+                        返回每日推荐
                       </Button>
                     </Link>
                   </div>

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BookOpen, Video, FileText, ClipboardList, ArrowRight, Code } from 'lucide-react';
+import { BookOpen, Video, FileText, ClipboardList, ArrowRight, Code, CheckCircle } from 'lucide-react';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { ProgressBar } from '@/components/common/ProgressBar';
@@ -124,33 +124,47 @@ export const KnowledgeDetail = () => {
         </div>
         
         <div className="space-y-3">
-          {problems.map((problem, index) => (
-            <motion.div
-              key={problem.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium"
-                  style={{ backgroundColor: `${getDifficultyColor(problem.difficulty)}15`, color: getDifficultyColor(problem.difficulty) }}
-                >
-                  {problem.difficulty === 'easy' ? '简单' : problem.difficulty === 'medium' ? '中等' : '困难'}
+          {problems.map((problem, index) => {
+            const completedRecord = userData.completedProblems.find(cp => cp.problemId === problem.id);
+            const isCompleted = completedRecord?.status === 'accepted';
+            
+            return (
+              <motion.div
+                key={problem.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
+                  isCompleted ? 'bg-green-50 border border-green-200' : 'bg-gray-50 hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium"
+                    style={{ backgroundColor: `${getDifficultyColor(problem.difficulty)}15`, color: getDifficultyColor(problem.difficulty) }}
+                  >
+                    {problem.difficulty === 'easy' ? '简单' : problem.difficulty === 'medium' ? '中等' : '困难'}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800 flex items-center gap-2">
+                      {problem.title}
+                      {isCompleted && <CheckCircle size={16} className="text-green-500" />}
+                    </p>
+                    <p className="text-sm text-gray-500">{problem.hints[0]}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-800">{problem.title}</p>
-                  <p className="text-sm text-gray-500">{problem.hints[0]}</p>
-                </div>
-              </div>
-              <Link to={`/daily/problem/${problem.id}`}>
-                <Button variant="outline" size="sm">
-                  开始练习
-                  <ArrowRight size={16} className="ml-1" />
-                </Button>
-              </Link>
-            </motion.div>
-          ))}
+                {isCompleted ? (
+                  <span className="text-sm text-green-600 font-medium">已完成</span>
+                ) : (
+                  <Link to={`/daily/problem/${problem.id}`}>
+                    <Button variant="outline" size="sm">
+                      开始练习
+                      <ArrowRight size={16} className="ml-1" />
+                    </Button>
+                  </Link>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       </Card>
       

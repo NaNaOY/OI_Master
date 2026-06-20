@@ -5,6 +5,7 @@ import type { ProblemRecord } from '@/types/problem';
 import { saveUserData, loadUserData, initializeUserData } from '@/utils/storage';
 import { analyzeDiagnosis, generateDiagnosisRecord, updateLearningProgress, calculateStats } from '@/utils/analysis';
 import { generateUUID } from '@/utils/storage';
+import { getProblemById } from '@/data/problems';
 
 interface UserState {
   userData: UserLearningData;
@@ -77,10 +78,13 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
   
   addProblemRecord: (record) => {
+    const problem = getProblemById(record.problemId);
+    if (!problem) return;
+    
     set(state => {
       const updatedProgress = updateLearningProgress(
         state.userData.learningProgress,
-        { id: record.problemId } as any,
+        problem,
         record.status === 'accepted'
       );
       
