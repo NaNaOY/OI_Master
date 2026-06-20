@@ -3,13 +3,15 @@ import { Clock, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { useDiagnosisStore } from '@/store/useDiagnosisStore';
+import { useUserStore } from '@/store/useUserStore';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 export const DiagnosisTest = () => {
   const { level } = useParams<{ level: 'CSP-J' | 'CSP-S' }>();
   const navigate = useNavigate();
-  const { questions, currentQuestionIndex, answers, submitAnswer, prevQuestion, nextQuestion, completeDiagnosis } = useDiagnosisStore();
+  const { questions, currentQuestionIndex, answers, submitAnswer, prevQuestion, nextQuestion, completeDiagnosis: resetDiagnosis } = useDiagnosisStore();
+  const { completeDiagnosis } = useUserStore();
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   
   const currentQuestion = questions[currentQuestionIndex];
@@ -39,8 +41,11 @@ export const DiagnosisTest = () => {
       alert('请先完成所有题目！');
       return;
     }
-    completeDiagnosis();
-    navigate('/diagnosis/report/test');
+    if (level) {
+      const record = completeDiagnosis(level, answers);
+      resetDiagnosis();
+      navigate(`/diagnosis/report/${record?.id || 'latest'}`);
+    }
   };
   
   const formatTime = (seconds: number) => {

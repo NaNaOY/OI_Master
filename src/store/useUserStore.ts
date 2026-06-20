@@ -13,7 +13,7 @@ interface UserState {
   saveUser: () => void;
   updateUserName: (name: string) => void;
   addDiagnosisAnswer: (answer: DiagnosisAnswer) => void;
-  completeDiagnosis: (level: 'CSP-J' | 'CSP-S') => DiagnosisRecord | null;
+  completeDiagnosis: (level: 'CSP-J' | 'CSP-S', answers: DiagnosisAnswer[]) => DiagnosisRecord | null;
   addProblemRecord: (record: ProblemRecord) => void;
   addMistake: (problemId: string, code: string, errorType: string, aiAnalysis: string) => void;
   markMistakeReviewed: (mistakeId: string) => void;
@@ -60,9 +60,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     }));
   },
   
-  completeDiagnosis: (level) => {
-    const answers: DiagnosisAnswer[] = [];
-    
+  completeDiagnosis: (level: 'CSP-J' | 'CSP-S', answers: DiagnosisAnswer[]): DiagnosisRecord | null => {
     const result = analyzeDiagnosis(answers);
     const record = generateDiagnosisRecord(level, result);
     

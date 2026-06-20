@@ -7,14 +7,17 @@ import { ProgressBar } from '@/components/common/ProgressBar';
 import { useUserStore } from '@/store/useUserStore';
 import { getKnowledgePointName, getMasteryColor, getMasteryLevel } from '@/utils/analysis';
 import { knowledgePoints } from '@/data/knowledgePoints';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 export const DiagnosisReport = () => {
+  const { id } = useParams<{ id: string }>();
   const { userData } = useUserStore();
   const navigate = useNavigate();
   const latestDiagnosis = userData.diagnosisHistory[userData.diagnosisHistory.length - 1];
   
-  if (!latestDiagnosis) {
+  const diagnosis = id === 'latest' ? latestDiagnosis : userData.diagnosisHistory.find(d => d.id === id) || latestDiagnosis;
+  
+  if (!diagnosis) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -34,14 +37,14 @@ export const DiagnosisReport = () => {
     );
   }
   
-  const radarData = Object.entries(latestDiagnosis.scores)
+  const radarData = Object.entries(diagnosis.scores)
     .map(([kpId, score]) => ({
       name: getKnowledgePointName(kpId),
       value: score,
     }))
     .filter(item => item.value > 0);
   
-  const sortedKP = Object.entries(latestDiagnosis.scores)
+  const sortedKP = Object.entries(diagnosis.scores)
     .map(([kpId, score]) => ({
       kpId,
       score,
@@ -63,7 +66,7 @@ export const DiagnosisReport = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">诊断报告</h1>
           <p className="text-gray-500 mt-1">
-            {latestDiagnosis.level} · {new Date(latestDiagnosis.date).toLocaleDateString('zh-CN')}
+            {diagnosis.level} · {new Date(diagnosis.date).toLocaleDateString('zh-CN')}
           </p>
         </div>
         <Button onClick={() => navigate('/learning-path')}>
@@ -79,7 +82,7 @@ export const DiagnosisReport = () => {
         >
           <Card className="p-4 text-center">
             <div className="text-3xl font-bold text-primary-600 mb-1">
-              {Math.round(Object.values(latestDiagnosis.scores).reduce((a, b) => a + b, 0) / Object.keys(latestDiagnosis.scores).length)}
+              {Math.round(Object.values(diagnosis.scores).reduce((a, b) => a + b, 0) / Object.keys(diagnosis.scores).length)}
             </div>
             <p className="text-sm text-gray-500">平均掌握度</p>
           </Card>
@@ -115,7 +118,7 @@ export const DiagnosisReport = () => {
         >
           <Card className="p-4 text-center">
             <div className="text-3xl font-bold text-accent-500 mb-1">
-              {latestDiagnosis.recommendations.length}
+              {diagnosis.recommendations.length}
             </div>
             <p className="text-sm text-gray-500">学习建议</p>
           </Card>
@@ -171,7 +174,7 @@ export const DiagnosisReport = () => {
           学习建议
         </h3>
         <div className="space-y-3">
-          {latestDiagnosis.recommendations.map((recommendation, index) => (
+          {diagnosis.recommendations.map((recommendation, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 10 }}

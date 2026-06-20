@@ -1,18 +1,22 @@
 import { motion } from 'framer-motion';
-import { BookOpen, ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronRight, FileText } from 'lucide-react';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { useDiagnosisStore } from '@/store/useDiagnosisStore';
+import { useUserStore } from '@/store/useUserStore';
 import { useNavigate } from 'react-router-dom';
 
 export const Diagnosis = () => {
   const { startDiagnosis } = useDiagnosisStore();
+  const { userData } = useUserStore();
   const navigate = useNavigate();
   
   const handleStartDiagnosis = (level: 'CSP-J' | 'CSP-S') => {
     startDiagnosis(level);
     navigate(`/diagnosis/test/${level}`);
   };
+  
+  const hasDiagnosisHistory = userData.diagnosisHistory.length > 0;
   
   return (
     <motion.div
@@ -115,6 +119,33 @@ export const Diagnosis = () => {
           </Card>
         </motion.div>
       </div>
+      
+      {hasDiagnosisHistory && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-6 md:mb-8"
+        >
+          <Card className="p-4 md:p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">诊断报告</h3>
+                  <p className="text-sm text-gray-500">上次诊断：{new Date(userData.diagnosisHistory[userData.diagnosisHistory.length - 1].date).toLocaleDateString('zh-CN')}</p>
+                </div>
+              </div>
+              <Button variant="outline" onClick={() => navigate('/diagnosis/report/latest')}>
+                查看报告
+                <ChevronRight size={18} className="ml-2" />
+              </Button>
+            </div>
+          </Card>
+        </motion.div>
+      )}
       
       <Card className="p-4 md:p-6">
         <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
