@@ -21,12 +21,7 @@ export const DiagnosisTest = () => {
       return;
     }
     
-    const savedAnswer = answers[currentQuestionIndex];
-    if (savedAnswer) {
-      setSelectedAnswer(Array.isArray(savedAnswer.answer) ? savedAnswer.answer.join(',') : savedAnswer.answer);
-    } else {
-      setSelectedAnswer('');
-    }
+    setSelectedAnswer('');
   }, [currentQuestionIndex, questions, level, navigate]);
   
   const handleSubmit = () => {
@@ -127,7 +122,6 @@ export const DiagnosisTest = () => {
             <div className="space-y-3">
               {currentQuestion.options.map((option, index) => {
                 const isSelected = selectedAnswer === optionLabels[index];
-                const isCorrect = currentQuestion.correctAnswer === optionLabels[index];
                 
                 return (
                   <button
@@ -136,10 +130,10 @@ export const DiagnosisTest = () => {
                     disabled={showResult}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                       showResult
-                        ? isCorrect
-                          ? 'border-green-500 bg-green-50'
-                          : isSelected && !isCorrect
+                        ? isSelected && answers[currentQuestionIndex]?.isCorrect === false
                           ? 'border-red-500 bg-red-50'
+                          : isSelected && answers[currentQuestionIndex]?.isCorrect
+                          ? 'border-green-500 bg-green-50'
                           : 'border-gray-100'
                         : isSelected
                         ? 'border-primary-500 bg-primary-50'
@@ -149,10 +143,10 @@ export const DiagnosisTest = () => {
                     <div className="flex items-center gap-3">
                       <span className={`w-8 h-8 rounded-full flex items-center justify-center font-medium ${
                         showResult
-                          ? isCorrect
-                            ? 'bg-green-500 text-white'
-                            : isSelected && !isCorrect
+                          ? isSelected && answers[currentQuestionIndex]?.isCorrect === false
                             ? 'bg-red-500 text-white'
+                            : isSelected && answers[currentQuestionIndex]?.isCorrect
+                            ? 'bg-green-500 text-white'
                             : 'bg-gray-100 text-gray-500'
                           : isSelected
                           ? 'bg-primary-500 text-white'
@@ -161,8 +155,8 @@ export const DiagnosisTest = () => {
                         {optionLabels[index]}
                       </span>
                       <span className="text-gray-700">{option}</span>
-                      {showResult && isCorrect && <CheckCircle className="ml-auto text-green-500" />}
-                      {showResult && isSelected && !isCorrect && <AlertCircle className="ml-auto text-red-500" />}
+                      {showResult && isSelected && answers[currentQuestionIndex]?.isCorrect && <CheckCircle className="ml-auto text-green-500" />}
+                      {showResult && isSelected && answers[currentQuestionIndex]?.isCorrect === false && <AlertCircle className="ml-auto text-red-500" />}
                     </div>
                   </button>
                 );
