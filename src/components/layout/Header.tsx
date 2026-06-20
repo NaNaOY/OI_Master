@@ -32,7 +32,9 @@ export const Header = () => {
               <span className="text-white font-bold text-sm">OI</span>
             </div>
             <span className="text-xl font-semibold text-neutral-800">
-              信奥赛诊断系统
+              <span className="font-bold">OI Path</span>
+              <span className="text-primary-500 ml-1">·</span>
+              <span className="text-neutral-500 ml-1 text-sm">信奥赛AI教练</span>
             </span>
           </Link>
           

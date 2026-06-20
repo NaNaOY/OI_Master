@@ -150,7 +150,7 @@ export const DailyPractice = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                完成今日推荐题目，持续提升编程能力
+                每日精选题目，针对性训练薄弱知识点
               </motion.p>
             </motion.div>
           </div>

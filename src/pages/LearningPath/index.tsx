@@ -188,7 +188,7 @@ export const LearningPath = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                共 {learningPath.nodes.length} 个知识点 · 系统化学习路径
+                {learningPath.nodes.length} 个核心知识点 · AI 智能规划学习路径
               </motion.p>
               
               {/* 级别切换按钮 */}

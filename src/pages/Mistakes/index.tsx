@@ -157,7 +157,7 @@ export const Mistakes = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                分析错误原因，针对性改进
+                AI 错题深度归因
               </motion.h1>
               
               <motion.p 
@@ -166,7 +166,7 @@ export const Mistakes = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                查看详细的AI归因分析，理解错误根源，精准提升薄弱知识点
+                智能分析错误根源，提供针对性改进建议，快速提升解题能力
               </motion.p>
             </motion.div>
           </div>

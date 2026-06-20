@@ -160,7 +160,7 @@ export const Home = () => {
                 >
                   <Sparkles className="text-yellow-300" size={28} />
                 </motion.div>
-                <span className="text-white/80 text-sm font-medium tracking-wide">信奥赛智能学习系统</span>
+                <span className="text-white/80 text-sm font-medium tracking-wide">OI Path · 信奥赛AI教练</span>
               </motion.div>
               
               <motion.h1 

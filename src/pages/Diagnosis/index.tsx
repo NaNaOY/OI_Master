@@ -146,7 +146,7 @@ export const Diagnosis = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                评估您的信奥赛水平
+                AI 智能诊断评估
               </motion.h1>
               
               <motion.p 
@@ -155,7 +155,7 @@ export const Diagnosis = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                通过专业诊断测试，精准评估您的知识掌握情况，为您定制个性化学习路径
+                基于 AI 算法精准评估您的知识掌握情况，生成个性化学习方案
               </motion.p>
             </motion.div>
           </div>
