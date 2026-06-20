@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Clock, ChevronLeft, ChevronRight, CheckCircle, AlertCircle } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { useDiagnosisStore } from '@/store/useDiagnosisStore';
@@ -11,7 +11,6 @@ export const DiagnosisTest = () => {
   const navigate = useNavigate();
   const { questions, currentQuestionIndex, answers, submitAnswer, prevQuestion, nextQuestion, completeDiagnosis } = useDiagnosisStore();
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
-  const [showResult, setShowResult] = useState(false);
   
   const currentQuestion = questions[currentQuestionIndex];
   
@@ -21,24 +20,25 @@ export const DiagnosisTest = () => {
       return;
     }
     
-    setSelectedAnswer('');
-  }, [currentQuestionIndex, questions, level, navigate]);
-  
-  const handleSubmit = () => {
-    if (!selectedAnswer) return;
-    submitAnswer(selectedAnswer);
-    setShowResult(true);
-  };
-  
-  const handleNext = () => {
-    if (!showResult && !selectedAnswer) return;
-    if (!showResult) {
-      submitAnswer(selectedAnswer);
+    const savedAnswer = answers[currentQuestionIndex];
+    if (savedAnswer) {
+      setSelectedAnswer(Array.isArray(savedAnswer.answer) ? savedAnswer.answer.join(',') : savedAnswer.answer);
+    } else {
+      setSelectedAnswer('');
     }
-    nextQuestion();
+  }, [currentQuestionIndex, questions, level, navigate, answers]);
+  
+  const handleSelectOption = (option: string) => {
+    setSelectedAnswer(option);
+    submitAnswer(option);
   };
   
   const handleComplete = () => {
+    const allAnswered = questions.every((_, index) => answers[index]);
+    if (!allAnswered) {
+      alert('请先完成所有题目！');
+      return;
+    }
     completeDiagnosis();
     navigate('/diagnosis/report/test');
   };
@@ -58,6 +58,7 @@ export const DiagnosisTest = () => {
   }
   
   const optionLabels = ['A', 'B', 'C', 'D'];
+  const allAnswered = questions.every((_, index) => answers[index]);
   
   return (
     <motion.div
@@ -84,13 +85,21 @@ export const DiagnosisTest = () => {
         {questions.map((_, index) => (
           <div
             key={index}
-            className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all ${
+            className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all cursor-pointer ${
               index === currentQuestionIndex
                 ? 'bg-primary-600 text-white'
                 : answers[index]
                 ? 'bg-green-100 text-green-600'
                 : 'bg-gray-100 text-gray-500'
             }`}
+            onClick={() => {
+              if (answers[index]) {
+                for (let i = 0; i < questions.length; i++) {
+                  if (i === index) break;
+                  nextQuestion();
+                }
+              }
+            }}
           >
             {index + 1}
           </div>
@@ -126,67 +135,27 @@ export const DiagnosisTest = () => {
                 return (
                   <button
                     key={index}
-                    onClick={() => setSelectedAnswer(optionLabels[index])}
-                    disabled={showResult}
+                    onClick={() => handleSelectOption(optionLabels[index])}
                     className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                      showResult
-                        ? isSelected && answers[currentQuestionIndex]?.isCorrect === false
-                          ? 'border-red-500 bg-red-50'
-                          : isSelected && answers[currentQuestionIndex]?.isCorrect
-                          ? 'border-green-500 bg-green-50'
-                          : 'border-gray-100'
-                        : isSelected
+                      isSelected
                         ? 'border-primary-500 bg-primary-50'
                         : 'border-gray-100 hover:border-gray-200'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className={`w-8 h-8 rounded-full flex items-center justify-center font-medium ${
-                        showResult
-                          ? isSelected && answers[currentQuestionIndex]?.isCorrect === false
-                            ? 'bg-red-500 text-white'
-                            : isSelected && answers[currentQuestionIndex]?.isCorrect
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-100 text-gray-500'
-                          : isSelected
+                        isSelected
                           ? 'bg-primary-500 text-white'
                           : 'bg-gray-100 text-gray-500'
                       }`}>
                         {optionLabels[index]}
                       </span>
                       <span className="text-gray-700">{option}</span>
-                      {showResult && isSelected && answers[currentQuestionIndex]?.isCorrect && <CheckCircle className="ml-auto text-green-500" />}
-                      {showResult && isSelected && answers[currentQuestionIndex]?.isCorrect === false && <AlertCircle className="ml-auto text-red-500" />}
                     </div>
                   </button>
                 );
               })}
             </div>
-          )}
-          
-          {showResult && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`mt-4 p-4 rounded-lg ${
-                answers[currentQuestionIndex]?.isCorrect ? 'bg-green-50' : 'bg-red-50'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                {answers[currentQuestionIndex]?.isCorrect ? (
-                  <>
-                    <CheckCircle className="text-green-500" />
-                    <span className="font-medium text-green-700">回答正确！</span>
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle className="text-red-500" />
-                    <span className="font-medium text-red-700">回答错误</span>
-                  </>
-                )}
-              </div>
-              <p className="text-sm text-gray-600">{currentQuestion.explanation}</p>
-            </motion.div>
           )}
         </motion.div>
       </Card>
@@ -202,25 +171,20 @@ export const DiagnosisTest = () => {
         </Button>
         
         {currentQuestionIndex < questions.length - 1 ? (
-          <div className="flex gap-2">
-            {!showResult ? (
-              <Button onClick={handleSubmit}>
-                提交答案
-                <CheckCircle size={20} className="ml-2" />
-              </Button>
-            ) : (
-              <Button onClick={handleNext}>
-                下一题
-                <ChevronRight size={20} className="ml-2" />
-              </Button>
-            )}
-          </div>
+          <Button onClick={nextQuestion} disabled={!selectedAnswer}>
+            下一题
+            <ChevronRight size={20} className="ml-2" />
+          </Button>
         ) : (
-          <Button onClick={handleComplete}>
-            完成测试
+          <Button onClick={handleComplete} disabled={!allAnswered}>
+            {allAnswered ? '提交答案' : '请完成所有题目'}
             <CheckCircle size={20} className="ml-2" />
           </Button>
         )}
+      </div>
+      
+      <div className="mt-4 text-center text-sm text-gray-500">
+        已完成 {answers.filter(Boolean).length} / {questions.length} 题
       </div>
     </motion.div>
   );
