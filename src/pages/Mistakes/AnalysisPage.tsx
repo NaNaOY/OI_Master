@@ -164,6 +164,28 @@ export const MistakeAnalysis = () => {
                     {difficultyConfig.label}
                   </motion.span>
                 )}
+                {/* 知识点标签 */}
+                {problem && problem.knowledgePoints.length > 0 && (
+                  <motion.div 
+                    className="flex items-center gap-2"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    {problem.knowledgePoints.map((kpId, idx) => (
+                      <motion.span
+                        key={kpId}
+                        className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 rounded-xl text-xs font-medium border border-blue-100/50"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.4 + idx * 0.1 }}
+                        whileHover={{ scale: 1.1, y: -2 }}
+                      >
+                        {getKnowledgePointName(kpId)}
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                )}
               </motion.div>
             </div>
           </motion.div>

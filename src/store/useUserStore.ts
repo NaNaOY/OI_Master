@@ -130,6 +130,8 @@ export const useUserStore = create<UserState>((set, get) => ({
       },
     }));
     
+    // 诊断完成后立即更新每日推荐
+    get().updateDailyRecommendations();
     get().saveUser();
     return record;
   },
@@ -205,10 +207,12 @@ export const useUserStore = create<UserState>((set, get) => ({
   updateDailyRecommendations: () => {
     const { learningProgress, mistakes, completedProblems } = get().userData;
     
+    // 获取薄弱知识点（掌握度低于80%）
     const weakKnowledgePoints = learningProgress
       .filter(p => p.masteryLevel < 80)
       .map(p => p.knowledgePointId);
     
+    // 获取错题涉及的知识点
     const mistakeKnowledgePoints = [...new Set(
       mistakes.map(m => {
         const problem = problems.find(p => p.id === m.problemId);
@@ -216,20 +220,27 @@ export const useUserStore = create<UserState>((set, get) => ({
       }).filter((k): k is string => !!k)
     )];
     
+    // 合并目标知识点
     const targetKnowledgePoints = [...new Set([...weakKnowledgePoints, ...mistakeKnowledgePoints])];
     
     const completedIds = new Set(completedProblems.map(cp => cp.problemId));
     
+    // 优先推荐与目标知识点相关的题目，如果没有目标知识点则推荐所有未完成题目
     let recommendedProblems = problems
       .filter(p => {
         if (completedIds.has(p.id)) return false;
-        return p.knowledgePoints.some(kp => targetKnowledgePoints.includes(kp));
+        // 如果有目标知识点，优先推荐相关题目；否则推荐所有题目
+        if (targetKnowledgePoints.length > 0) {
+          return p.knowledgePoints.some(kp => targetKnowledgePoints.includes(kp));
+        }
+        return true;
       })
       .sort((a, b) => {
         const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
         return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
       });
     
+    // 如果推荐题目不足5道，补充其他题目
     if (recommendedProblems.length < 5) {
       const additionalProblems = problems
         .filter(p => !completedIds.has(p.id) && !recommendedProblems.find(rp => rp.id === p.id))
