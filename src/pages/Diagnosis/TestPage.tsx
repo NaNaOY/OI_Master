@@ -27,8 +27,7 @@ export const DiagnosisTest = () => {
     } else {
       setSelectedAnswer('');
     }
-    setShowResult(false);
-  }, [currentQuestionIndex, questions, answers, level, navigate]);
+  }, [currentQuestionIndex, questions, level, navigate]);
   
   const handleSubmit = () => {
     if (!selectedAnswer) return;
