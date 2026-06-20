@@ -93,7 +93,6 @@ export const DiagnosisReport = () => {
       animate="visible"
       className="space-y-8"
     >
-      {/* 头部区域 */}
       <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
           <motion.div 
@@ -126,247 +125,185 @@ export const DiagnosisReport = () => {
         </motion.div>
       </motion.div>
       
-      {/* 统计卡片 */}
       <motion.div 
-        className="grid grid-cols-4 gap-5"
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
         variants={containerVariants}
       >
         {[
-          { value: avgScore, label: '平均掌握度', icon: <Target size={22} />, gradient: 'from-blue-500 to-indigo-600', iconBg: 'bg-gradient-to-br from-blue-50 to-indigo-50' },
-          { value: strongPoints.length, label: '优势知识点', icon: <CheckCircle size={22} />, gradient: 'from-emerald-500 to-green-600', iconBg: 'bg-gradient-to-br from-emerald-50 to-green-50' },
-          { value: weakPoints.length, label: '薄弱知识点', icon: <AlertTriangle size={22} />, gradient: 'from-red-500 to-rose-600', iconBg: 'bg-gradient-to-br from-red-50 to-rose-50' },
-          { value: diagnosis.recommendations.length, label: '学习建议', icon: <Award size={22} />, gradient: 'from-violet-500 to-purple-600', iconBg: 'bg-gradient-to-br from-violet-50 to-purple-50' },
+          { value: avgScore, label: '平均掌握度', icon: <Target size={20} />, gradient: 'from-blue-500 to-indigo-600' },
+          { value: strongPoints.length, label: '优势知识点', icon: <CheckCircle size={20} />, gradient: 'from-emerald-500 to-green-600' },
+          { value: weakPoints.length, label: '薄弱知识点', icon: <AlertTriangle size={20} />, gradient: 'from-red-500 to-rose-600' },
+          { value: diagnosis.recommendations.length, label: '学习建议', icon: <Award size={20} />, gradient: 'from-violet-500 to-purple-600' },
         ].map((stat, index) => (
           <motion.div
             key={stat.label}
             variants={itemVariants}
-            whileHover={{ y: -8, scale: 1.02 }}
+            whileHover={{ y: -6, scale: 1.02 }}
             transition={{ duration: 0.3 }}
           >
-            <Card className="p-6 text-center overflow-hidden group relative border border-neutral-100/50 shadow-lg rounded-2xl">
-              {/* 动态渐变背景 */}
-              <motion.div 
-                className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-              />
-              {/* 顶部装饰线 */}
-              <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient} opacity-80`} />
+            <Card className="p-5 text-center overflow-hidden relative border border-neutral-100/50 shadow-md rounded-xl">
+              <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}`} />
               
               <motion.div 
-                className={`w-14 h-14 rounded-2xl ${stat.iconBg} flex items-center justify-center mx-auto mb-4 shadow-md`}
-                whileHover={{ scale: 1.1, rotate: [0, -10, 10, 0] }}
+                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} opacity-10 flex items-center justify-center mx-auto mb-3`}
+                whileHover={{ scale: 1.1 }}
               >
                 {stat.icon}
               </motion.div>
               <motion.p 
-                className="text-3xl font-bold text-neutral-800 tabular-nums"
+                className="text-2xl font-bold text-neutral-800 tabular-nums"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 + index * 0.1 }}
               >
                 {stat.value}
               </motion.p>
-              <p className="text-sm text-neutral-500 mt-1 font-medium">{stat.label}</p>
+              <p className="text-sm text-neutral-500 mt-1">{stat.label}</p>
             </Card>
           </motion.div>
         ))}
       </motion.div>
       
-      {/* 图表区域 */}
       <motion.div 
-        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
         variants={containerVariants}
       >
-        <motion.div variants={itemVariants}>
-          <Card className="p-8 border border-neutral-100/50 shadow-lg rounded-2xl overflow-hidden relative">
-            {/* 背景装饰 */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100/50 to-transparent rounded-full blur-2xl opacity-50" />
-            
+        <motion.div variants={itemVariants} className="lg:col-span-2">
+          <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">
             <motion.h3 
-              className="font-bold text-neutral-800 mb-6 flex items-center gap-3 text-lg"
+              className="font-bold text-neutral-800 mb-4 flex items-center gap-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <TrendingUp size={22} className="text-blue-500" />
-              </motion.div>
+              <TrendingUp size={20} className="text-blue-500" />
               知识点掌握度雷达图
             </motion.h3>
-            <RadarChart data={radarData} />
+            <div className="h-[320px]">
+              <RadarChart data={radarData} />
+            </div>
           </Card>
         </motion.div>
         
         <motion.div variants={itemVariants}>
-          <Card className="p-8 border border-neutral-100/50 shadow-lg rounded-2xl overflow-hidden relative">
-            {/* 背景装饰 */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-100/50 to-transparent rounded-full blur-2xl opacity-50" />
-            
+          <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">
             <motion.h3 
-              className="font-bold text-neutral-800 mb-6 flex items-center gap-3 text-lg"
+              className="font-bold text-neutral-800 mb-4 flex items-center gap-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <AlertTriangle size={22} className="text-red-500" />
-              </motion.div>
+              <AlertTriangle size={20} className="text-red-500" />
               薄弱知识点
             </motion.h3>
             
             {weakPoints.length > 0 ? (
-              <motion.div 
-                className="space-y-5"
-                variants={containerVariants}
-              >
+              <motion.div className="space-y-3">
                 {weakPoints.map((item) => (
                   <motion.div
                     key={item.kpId}
                     variants={itemVariants}
-                    className="p-4 rounded-2xl bg-gradient-to-r from-red-50 to-transparent border border-red-100/50"
+                    whileHover={{ x: 4 }}
+                    className="p-3 rounded-xl bg-red-50/50 border border-red-100"
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-semibold text-neutral-700">{item.kp?.name}</span>
-                      <motion.span 
-                        className="text-sm font-bold text-red-600"
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        {item.score}%
-                      </motion.span>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-neutral-700 text-sm">{item.kp?.name}</span>
+                      <span className="text-sm font-bold text-red-600">{item.score}%</span>
                     </div>
                     <ProgressBar
                       value={item.score}
                       color={getMasteryColor(item.score)}
-                      className="h-3 rounded-full"
+                      className="h-2 rounded-full"
                     />
                   </motion.div>
                 ))}
               </motion.div>
             ) : (
-              <motion.div 
-                className="text-center py-12"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-              >
+              <motion.div className="text-center py-8">
                 <motion.div
-                  className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center mx-auto mb-4"
+                  className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3"
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <TrendingUp size={32} className="text-emerald-500" />
+                  <CheckCircle size={24} className="text-emerald-500" />
                 </motion.div>
-                <p className="text-emerald-600 font-semibold text-lg">太棒了！没有明显的薄弱项</p>
+                <p className="text-emerald-600 font-semibold">太棒了！没有薄弱项</p>
               </motion.div>
             )}
           </Card>
         </motion.div>
       </motion.div>
       
-      {/* 学习建议 */}
       <motion.div variants={itemVariants}>
-        <Card className="p-8 border border-neutral-100/50 shadow-lg rounded-2xl overflow-hidden relative">
-          {/* 背景装饰 */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-violet-100/50 to-transparent rounded-full blur-2xl opacity-50" />
-          
+        <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">
           <motion.h3 
-            className="font-bold text-neutral-800 mb-6 flex items-center gap-3 text-lg"
+            className="font-bold text-neutral-800 mb-4 flex items-center gap-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <BookOpen size={22} className="text-violet-500" />
-            </motion.div>
+            <BookOpen size={20} className="text-violet-500" />
             学习建议
           </motion.h3>
           
-          <motion.div 
-            className="space-y-4"
-            variants={containerVariants}
-          >
+          <motion.div className="space-y-3">
             {diagnosis.recommendations.map((recommendation, index) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
-                whileHover={{ x: 5 }}
-                className="flex items-start gap-4 p-5 bg-gradient-to-r from-primary-50 to-transparent rounded-2xl border border-primary-100/50 group"
+                whileHover={{ x: 4 }}
+                className="flex items-start gap-3 p-4 bg-primary-50/50 rounded-xl border border-primary-100"
               >
-                <motion.span 
-                  className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-indigo-500 text-white text-sm font-bold flex items-center justify-center shadow-lg"
-                  whileHover={{ scale: 1.1 }}
-                >
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-indigo-500 text-white text-sm font-bold flex items-center justify-center">
                   {index + 1}
-                </motion.span>
-                <span className="text-neutral-700 font-medium leading-relaxed">{recommendation}</span>
+                </span>
+                <span className="text-neutral-700 text-sm leading-relaxed">{recommendation}</span>
               </motion.div>
             ))}
           </motion.div>
         </Card>
       </motion.div>
       
-      {/* 知识点详细分析 */}
       <motion.div variants={itemVariants}>
-        <Card className="p-8 border border-neutral-100/50 shadow-lg rounded-2xl overflow-hidden relative">
-          {/* 背景装饰 */}
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-t from-neutral-100/50 to-transparent rounded-full blur-2xl opacity-50" />
-          
+        <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">
           <motion.h3 
-            className="font-bold text-neutral-800 mb-6 text-lg"
+            className="font-bold text-neutral-800 mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
             知识点详细分析
           </motion.h3>
           
-          <motion.div 
-            className="space-y-4"
-            variants={containerVariants}
-          >
+          <motion.div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {sortedKP.map((item) => (
               <motion.div
                 key={item.kpId}
                 variants={itemVariants}
-                whileHover={{ y: -2, scale: 1.005 }}
-                className="flex items-center justify-between p-4 rounded-2xl border border-neutral-100/50 bg-gradient-to-r from-white to-neutral-50/30"
+                whileHover={{ y: -2 }}
+                className="p-4 rounded-xl bg-neutral-50/50 border border-neutral-100"
               >
-                <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <span className="font-semibold text-neutral-700 whitespace-nowrap overflow-hidden text-ellipsis">{item.kp?.name}</span>
-                  <motion.span
-                    className="flex-shrink-0 text-xs px-3 py-1 rounded-full font-medium"
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-neutral-700 text-sm">{item.kp?.name}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium`}
                     style={{
                       backgroundColor: `${getMasteryColor(item.score)}15`,
                       color: getMasteryColor(item.score),
                     }}
-                    whileHover={{ scale: 1.1 }}
                   >
                     {getMasteryLevel(item.score)}
-                  </motion.span>
-                  <div className="flex-1 min-w-0 ml-4">
-                    <ProgressBar
-                      value={item.score}
-                      color={getMasteryColor(item.score)}
-                      className="h-3 rounded-full"
-                    />
-                  </div>
+                  </span>
                 </div>
-                <motion.span 
-                  className="flex-shrink-0 text-lg font-bold text-neutral-600 w-16 text-right tabular-nums ml-6"
-                  whileHover={{ scale: 1.1 }}
-                >
-                  {item.score}%
-                </motion.span>
+                <div className="flex items-center gap-3">
+                  <ProgressBar
+                    value={item.score}
+                    color={getMasteryColor(item.score)}
+                    className="flex-1 h-2 rounded-full"
+                  />
+                  <span className="text-sm font-bold text-neutral-600 w-10 text-right tabular-nums">{item.score}%</span>
+                </div>
               </motion.div>
             ))}
           </motion.div>
         </Card>
       </motion.div>
       
-      {/* 底部按钮 */}
       <motion.div 
         variants={itemVariants}
         className="flex justify-center pt-4"
@@ -375,12 +312,7 @@ export const DiagnosisReport = () => {
           <Link to="/learning-path">
             <Button size="lg" className="bg-gradient-to-r from-primary-500 to-indigo-500 hover:from-primary-600 hover:to-indigo-600 shadow-xl px-10 py-4 rounded-xl font-semibold">
               根据诊断结果规划学习路径
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                <ArrowRight size={22} className="ml-3" />
-              </motion.div>
+              <ArrowRight size={20} className="ml-3" />
             </Button>
           </Link>
         </motion.div>

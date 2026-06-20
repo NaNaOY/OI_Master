@@ -351,10 +351,15 @@ export const LearningPath = () => {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
                       >
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-neutral-500 font-medium">掌握度</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-primary-500 to-indigo-500 flex items-center justify-center">
+                              <Star size={10} className="text-white" />
+                            </div>
+                            <span className="text-sm text-neutral-600 font-medium">掌握度</span>
+                          </div>
                           <motion.span 
-                            className="font-bold"
+                            className="font-bold text-lg"
                             style={{ color: getMasteryColor(mastery) }}
                             whileHover={{ scale: 1.1 }}
                           >
@@ -367,10 +372,40 @@ export const LearningPath = () => {
                           height={6}
                           className="rounded-full"
                         />
-                        <div className="flex items-center justify-between text-xs text-neutral-500">
-                          <span className="font-medium">进度 {completed}/{totalProblems} 题</span>
+                        
+                        <div className="h-px bg-neutral-100" />
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                              <Target size={10} className="text-white" />
+                            </div>
+                            <span className="text-sm text-neutral-600 font-medium">学习进度</span>
+                          </div>
                           <motion.span 
-                            className="px-2 py-0.5 rounded-full font-medium"
+                            className="font-bold text-amber-600"
+                            whileHover={{ scale: 1.1 }}
+                          >
+                            {completed}/{totalProblems} 题
+                          </motion.span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-3 bg-neutral-100 rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${totalProblems > 0 ? (completed / totalProblems) * 100 : 0}%` }}
+                              transition={{ duration: 0.8 }}
+                            />
+                          </div>
+                          <span className="text-xs text-neutral-500 w-12 text-right">
+                            {totalProblems > 0 ? Math.round((completed / totalProblems) * 100) : 0}%
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center justify-end">
+                          <motion.span 
+                            className="text-xs px-3 py-1 rounded-full font-medium"
                             style={{
                               backgroundColor: `${getMasteryColor(mastery)}20`,
                               color: getMasteryColor(mastery),
