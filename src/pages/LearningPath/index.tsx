@@ -63,16 +63,28 @@ export const LearningPath = () => {
           <p className="text-neutral-500 mt-1">{learningPath.name}</p>
         </div>
         <div className="flex gap-2">
-          <Link to="/learning-path/CSP-J">
-            <Button variant={pathLevel === 'CSP-J' ? 'primary' : 'outline'} size="sm">
+          {pathLevel === 'CSP-J' ? (
+            <Button variant="primary" size="sm" disabled>
               CSP-J
             </Button>
-          </Link>
-          <Link to="/learning-path/CSP-S">
-            <Button variant={pathLevel === 'CSP-S' ? 'primary' : 'outline'} size="sm">
+          ) : (
+            <Link to="/learning-path/level/CSP-J">
+              <Button variant="outline" size="sm">
+                CSP-J
+              </Button>
+            </Link>
+          )}
+          {pathLevel === 'CSP-S' ? (
+            <Button variant="primary" size="sm" disabled>
               CSP-S
             </Button>
-          </Link>
+          ) : (
+            <Link to="/learning-path/level/CSP-S">
+              <Button variant="outline" size="sm">
+                CSP-S
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
       
@@ -159,7 +171,7 @@ export const LearningPath = () => {
                     </div>
                     
                     {unlocked && (
-                      <Link to={`/learning-path/${node.knowledgePointId}`}>
+                      <Link to={`/learning-path/kp/${node.knowledgePointId}`}>
                         <Button variant="outline" size="sm">
                           学习
                           <ArrowRight size={16} className="ml-1" />

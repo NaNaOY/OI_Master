@@ -37,7 +37,8 @@ export const AppRoutes = () => {
           <Route path="/diagnosis/test/:level" element={<AnimatedPage><DiagnosisTest /></AnimatedPage>} />
           <Route path="/diagnosis/report/:id" element={<AnimatedPage><DiagnosisReport /></AnimatedPage>} />
           <Route path="/learning-path" element={<AnimatedPage><LearningPath /></AnimatedPage>} />
-          <Route path="/learning-path/:nodeId" element={<AnimatedPage><KnowledgeDetail /></AnimatedPage>} />
+          <Route path="/learning-path/level/:level" element={<AnimatedPage><LearningPath /></AnimatedPage>} />
+          <Route path="/learning-path/kp/:nodeId" element={<AnimatedPage><KnowledgeDetail /></AnimatedPage>} />
           <Route path="/daily" element={<AnimatedPage><DailyPractice /></AnimatedPage>} />
           <Route path="/daily/problem/:id" element={<AnimatedPage><ProblemPage /></AnimatedPage>} />
           <Route path="/mistakes" element={<AnimatedPage><Mistakes /></AnimatedPage>} />
