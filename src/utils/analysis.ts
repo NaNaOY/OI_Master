@@ -180,7 +180,14 @@ export const getKnowledgePointName = (id: string): string => {
 // 获取题目标题
 export const getProblemTitle = (id: string): string => {
   const problem = problems.find(p => p.id === id);
-  return problem?.title || id;
+  if (problem) return problem.title;
+  
+  const normalizedId = id.startsWith('p') && !id.startsWith('pj') && !id.startsWith('ps')
+    ? (id.match(/^p(\d+)$/) ? `pj${id.match(/^p(\d+)$/)![1]}` : id)
+    : id;
+  
+  const normalizedProblem = problems.find(p => p.id === normalizedId);
+  return normalizedProblem?.title || id;
 };
 
 // 获取分类颜色

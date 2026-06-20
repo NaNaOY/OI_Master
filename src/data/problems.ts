@@ -65,7 +65,14 @@ export const problems: Problem[] = [
 ];
 
 export const getProblemById = (id: string): Problem | undefined => {
-  return problems.find(p => p.id === id);
+  let problem = problems.find(p => p.id === id);
+  if (problem) return problem;
+  
+  const normalizedId = id.startsWith('p') && !id.startsWith('pj') && !id.startsWith('ps')
+    ? (id.match(/^p(\d+)$/) ? `pj${id.match(/^p(\d+)$/)![1]}` : id)
+    : id;
+  
+  return problems.find(p => p.id === normalizedId);
 };
 
 export const getProblemsByKnowledgePoint = (knowledgePointId: string): Problem[] => {
