@@ -305,6 +305,7 @@ export const DiagnosisReport = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="w-full py-2.5 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-medium hover:from-violet-600 hover:to-purple-600 transition-all"
+                      onClick={() => navigate(`/learning-path/kp/${item.kpId}`)}
                     >
                       开始学习 →
                     </motion.button>
