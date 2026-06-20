@@ -87,7 +87,7 @@ export const useUserStore = create<UserState>((set, get) => ({
           // CSP-J: difficultyLevel <= 5
           // CSP-S: 所有知识点
           if (level === 'CSP-J') {
-            return kp.difficultyLevel <= 5;
+            return kp.difficulty <= 5;
           }
           return true;
         }) || [];

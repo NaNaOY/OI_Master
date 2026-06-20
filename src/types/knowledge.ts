@@ -7,11 +7,10 @@ export interface LearningResource {
 export interface KnowledgePoint {
   id: string;
   name: string;
-  category: '程序设计基础' | '基础数据结构' | '基础算法' | '数学基础' | '进阶数据结构' | '进阶算法' | '图论' | '数学进阶';
+  category: string;
+  difficulty: number;
   description: string;
   prerequisites: string[];
-  difficultyLevel: number;
-  problems: string[];
   learningResources: LearningResource[];
 }
 

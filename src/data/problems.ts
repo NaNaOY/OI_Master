@@ -1,457 +1,67 @@
 import type { Problem } from '@/types/problem';
 
-// NOI大纲配套题目
 export const problems: Problem[] = [
   // ============ CSP-J 入门组 ============
-  // kp1: 程序设计基础
-  {
-    id: 'p1',
-    title: 'A+B问题',
-    difficulty: 'easy',
-    knowledgePoints: ['kp1'],
-    description: '输入两个整数A和B，输出它们的和。',
-    inputFormat: '一行，包含两个整数A和B，用空格分隔。',
-    outputFormat: '一行，输出A+B的结果。',
-    sampleInput: '1 2',
-    sampleOutput: '3',
-    testCases: [
-      { input: '1 2', output: '3' },
-      { input: '100 200', output: '300' },
-      { input: '-5 3', output: '-2' },
-    ],
-    hints: ['使用加法运算符+即可'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  {
-    id: 'p2',
-    title: '求最大值',
-    difficulty: 'easy',
-    knowledgePoints: ['kp1'],
-    description: '输入三个整数，输出其中的最大值。',
-    inputFormat: '一行，包含三个整数，用空格分隔。',
-    outputFormat: '一行，输出最大值。',
-    sampleInput: '3 1 4',
-    sampleOutput: '4',
-    testCases: [
-      { input: '3 1 4', output: '4' },
-      { input: '-1 -5 -3', output: '-1' },
-      { input: '100 200 150', output: '200' },
-    ],
-    hints: ['使用if语句或max函数'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp2: 条件语句与循环
-  {
-    id: 'p3',
-    title: '水仙花数',
-    difficulty: 'easy',
-    knowledgePoints: ['kp2'],
-    description: '输出所有三位数的水仙花数（水仙花数是指一个三位数，其各位数字的立方和等于该数本身）。',
-    inputFormat: '无输入',
-    outputFormat: '输出所有水仙花数，每个数占一行，按从小到大的顺序输出。',
-    sampleInput: '',
-    sampleOutput: '153\n370\n371\n407',
-    testCases: [
-      { input: '', output: '153\n370\n371\n407' },
-    ],
-    hints: ['使用循环遍历100-999，使用除法和取模分离各位数字'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  {
-    id: 'p4',
-    title: '打印九九乘法表',
-    difficulty: 'easy',
-    knowledgePoints: ['kp2'],
-    description: '打印九九乘法表。',
-    inputFormat: '无输入',
-    outputFormat: '输出九九乘法表，格式为"1*1=1"，每个式子后一个空格，一行一个数字的乘法。',
-    sampleInput: '',
-    sampleOutput: '1*1=1 \n1*2=2 2*2=4 \n...',
-    testCases: [
-      { input: '', output: '1*1=1 \n1*2=2 2*2=4' },
-    ],
-    hints: ['使用双重循环，外层控制被乘数，内层控制乘数'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp3: 函数基础
-  {
-    id: 'p5',
-    title: '阶乘函数',
-    difficulty: 'easy',
-    knowledgePoints: ['kp3'],
-    description: '编写函数计算n的阶乘，主程序读取n并输出结果。',
-    inputFormat: '一行，一个整数n（0<=n<=12）。',
-    outputFormat: '一行，输出n的阶乘。',
-    sampleInput: '5',
-    sampleOutput: '120',
-    testCases: [
-      { input: '5', output: '120' },
-      { input: '0', output: '1' },
-      { input: '12', output: '479001600' },
-    ],
-    hints: ['注意0的阶乘为1，考虑使用递归或循环'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp4: 数组
-  {
-    id: 'p6',
-    title: '数组求和',
-    difficulty: 'easy',
-    knowledgePoints: ['kp4'],
-    description: '输入一个整数数组，输出数组中所有元素的和。',
-    inputFormat: '第一行输入整数n，表示数组长度；第二行输入n个整数。',
-    outputFormat: '一行，输出数组元素的和。',
-    sampleInput: '3\n1 2 3',
-    sampleOutput: '6',
-    testCases: [
-      { input: '3\n1 2 3', output: '6' },
-      { input: '5\n10 20 30 40 50', output: '150' },
-    ],
-    hints: ['使用循环遍历数组累加'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  {
-    id: 'p7',
-    title: '矩阵转置',
-    difficulty: 'medium',
-    knowledgePoints: ['kp4'],
-    description: '输入一个3x3的矩阵，输出其转置矩阵。',
-    inputFormat: '3行，每行3个整数，用空格分隔。',
-    outputFormat: '3行，每行3个整数，用空格分隔，为转置后的矩阵。',
-    sampleInput: '1 2 3\n4 5 6\n7 8 9',
-    sampleOutput: '1 4 7\n2 5 8\n3 6 9',
-    testCases: [
-      { input: '1 2 3\n4 5 6\n7 8 9', output: '1 4 7\n2 5 8\n3 6 9' },
-    ],
-    hints: ['转置后a[i][j]变为a[j][i]'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp5: 字符串
-  {
-    id: 'p8',
-    title: '字符串反转',
-    difficulty: 'easy',
-    knowledgePoints: ['kp5'],
-    description: '输入一个字符串，将其反转后输出。',
-    inputFormat: '一行，一个字符串（长度不超过100）。',
-    outputFormat: '一行，输出反转后的字符串。',
-    sampleInput: 'hello',
-    sampleOutput: 'olleh',
-    testCases: [
-      { input: 'hello', output: 'olleh' },
-      { input: 'abcd', output: 'dcba' },
-    ],
-    hints: ['可以使用另一个字符串从后往前存储，或直接原地交换'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp6: 排序算法
-  {
-    id: 'p9',
-    title: '冒泡排序',
-    difficulty: 'medium',
-    knowledgePoints: ['kp6'],
-    description: '使用冒泡排序算法对数组进行升序排序。',
-    inputFormat: '第一行输入整数n，表示数组长度；第二行输入n个整数。',
-    outputFormat: '一行，输出排序后的数组，用空格分隔。',
-    sampleInput: '5\n3 1 4 1 5',
-    sampleOutput: '1 1 3 4 5',
-    testCases: [
-      { input: '5\n3 1 4 1 5', output: '1 1 3 4 5' },
-      { input: '4\n4 3 2 1', output: '1 2 3 4' },
-    ],
-    hints: ['比较相邻元素，交换顺序错误的元素'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp7: 查找算法
-  {
-    id: 'p10',
-    title: '二分查找',
-    difficulty: 'medium',
-    knowledgePoints: ['kp7'],
-    description: '在有序数组中查找目标值的位置。',
-    inputFormat: '第一行输入整数n和target；第二行输入n个有序整数。',
-    outputFormat: '一行，输出目标值的索引（从0开始），不存在输出-1。',
-    sampleInput: '5 3\n1 2 3 4 5',
-    sampleOutput: '2',
-    testCases: [
-      { input: '5 3\n1 2 3 4 5', output: '2' },
-      { input: '5 6\n1 2 3 4 5', output: '-1' },
-    ],
-    hints: ['每次将搜索范围缩小一半'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp8: 基础数论
-  {
-    id: 'p11',
-    title: '质数判断',
-    difficulty: 'easy',
-    knowledgePoints: ['kp8'],
-    description: '判断一个数是否为质数。',
-    inputFormat: '一行，输入整数n（2<=n<=10^6）。',
-    outputFormat: '一行，如果是质数输出YES，否则输出NO。',
-    sampleInput: '7',
-    sampleOutput: 'YES',
-    testCases: [
-      { input: '7', output: 'YES' },
-      { input: '10', output: 'NO' },
-      { input: '2', output: 'YES' },
-    ],
-    hints: ['检查到sqrt(n)即可'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp9: 模拟与枚举
-  {
-    id: 'p12',
-    title: '鸡兔同笼',
-    difficulty: 'easy',
-    knowledgePoints: ['kp9'],
-    description: '鸡兔同笼，已知头数和脚数，求鸡和兔各几只。如果无解输出"Invalid"。',
-    inputFormat: '一行，两个整数h（头数）和f（脚数），用空格分隔。',
-    outputFormat: '一行，输出鸡的数量和兔的数量，用空格分隔。如果无解输出Invalid。',
-    sampleInput: '35 94',
-    sampleOutput: '23 12',
-    testCases: [
-      { input: '35 94', output: '23 12' },
-      { input: '10 30', output: 'Invalid' },
-    ],
-    hints: ['设鸡x只，兔y只，满足x+y=h, 2x+4y=f'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
+  // j1: 程序设计基础
+  { id: 'pj1', title: 'A+B问题', difficulty: 'easy', knowledgePoints: ['j1'], description: '输入两个整数A和B，输出它们的和。', inputFormat: '一行，包含两个整数A和B，用空格分隔。', outputFormat: '一行，输出A+B的结果。', sampleInput: '1 2', sampleOutput: '3', testCases: [{ input: '1 2', output: '3' }, { input: '100 200', output: '300' }, { input: '-5 3', output: '-2' }], hints: ['使用加法运算符+即可'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'pj2', title: '求最大值', difficulty: 'easy', knowledgePoints: ['j1'], description: '输入三个整数，输出其中的最大值。', inputFormat: '一行，包含三个整数，用空格分隔。', outputFormat: '一行，输出最大值。', sampleInput: '3 1 4', sampleOutput: '4', testCases: [{ input: '3 1 4', output: '4' }, { input: '-1 -5 -3', output: '-1' }], hints: ['使用if语句或max函数'], timeLimit: 1000, memoryLimit: 256000 },
+  // j2: 选择结构
+  { id: 'pj3', title: '水仙花数', difficulty: 'easy', knowledgePoints: ['j2'], description: '输出所有三位数的水仙花数。', inputFormat: '无输入', outputFormat: '输出所有水仙花数，每个数占一行。', sampleInput: '', sampleOutput: '153\n370\n371\n407', testCases: [{ input: '', output: '153\n370\n371\n407' }], hints: ['使用循环遍历100-999'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'pj4', title: '成绩评级', difficulty: 'easy', knowledgePoints: ['j2'], description: '根据输入的成绩输出等级：A(>=90), B(>=80), C(>=60), D(<60)', inputFormat: '一行，一个整数表示成绩（0-100）', outputFormat: '一行，输出等级字符', sampleInput: '85', sampleOutput: 'B', testCases: [{ input: '85', output: 'B' }, { input: '95', output: 'A' }], hints: ['使用if-else语句判断'], timeLimit: 1000, memoryLimit: 256000 },
+  // j3: 循环结构
+  { id: 'pj5', title: '打印九九乘法表', difficulty: 'easy', knowledgePoints: ['j3'], description: '打印九九乘法表。', inputFormat: '无输入', outputFormat: '输出九九乘法表', sampleInput: '', sampleOutput: '1*1=1 1*2=2 ...', testCases: [{ input: '', output: '1*1=1' }], hints: ['使用双重循环'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'pj6', title: '求阶乘和', difficulty: 'medium', knowledgePoints: ['j3'], description: '求1!+2!+...+n!的值', inputFormat: '一行，一个整数n（1<=n<=10）', outputFormat: '一行，输出阶乘和', sampleInput: '4', sampleOutput: '33', testCases: [{ input: '4', output: '33' }, { input: '3', output: '9' }], hints: ['注意数据溢出'], timeLimit: 1000, memoryLimit: 256000 },
+  // j4: 函数基础
+  { id: 'pj7', title: '阶乘函数', difficulty: 'easy', knowledgePoints: ['j4'], description: '编写函数计算n的阶乘', inputFormat: '一行，一个整数n（0<=n<=12）', outputFormat: '一行，输出n的阶乘', sampleInput: '5', sampleOutput: '120', testCases: [{ input: '5', output: '120' }, { input: '0', output: '1' }], hints: ['注意0的阶乘为1'], timeLimit: 1000, memoryLimit: 256000 },
+  // j5: 数组基础
+  { id: 'pj8', title: '数组求和', difficulty: 'easy', knowledgePoints: ['j5'], description: '输入一个整数数组，输出数组中所有元素的和', inputFormat: '第一行输入n；第二行输入n个整数', outputFormat: '一行，输出和', sampleInput: '3\n1 2 3', sampleOutput: '6', testCases: [{ input: '3\n1 2 3', output: '6' }], hints: ['使用循环遍历数组累加'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'pj9', title: '数组最大值', difficulty: 'easy', knowledgePoints: ['j5'], description: '找出数组中的最大值及其位置', inputFormat: '第一行输入n；第二行输入n个整数', outputFormat: '输出最大值和下标', sampleInput: '5\n3 1 4 5 2', sampleOutput: '5 3', testCases: [{ input: '5\n3 1 4 5 2', output: '5 3' }], hints: ['记录最大值和下标'], timeLimit: 1000, memoryLimit: 256000 },
+  // j6: 字符串处理
+  { id: 'pj10', title: '字符串反转', difficulty: 'easy', knowledgePoints: ['j6'], description: '输入一个字符串，将其反转后输出', inputFormat: '一行，一个字符串', outputFormat: '一行，反转后的字符串', sampleInput: 'hello', sampleOutput: 'olleh', testCases: [{ input: 'hello', output: 'olleh' }], hints: ['可以从后往前读取'], timeLimit: 1000, memoryLimit: 256000 },
+  // j7: 基础排序算法
+  { id: 'pj11', title: '冒泡排序', difficulty: 'medium', knowledgePoints: ['j7'], description: '使用冒泡排序对数组升序排序', inputFormat: '第一行输入n；第二行输入n个整数', outputFormat: '一行，输出排序后的数组', sampleInput: '5\n3 1 4 1 5', sampleOutput: '1 1 3 4 5', testCases: [{ input: '5\n3 1 4 1 5', output: '1 1 3 4 5' }], hints: ['比较相邻元素交换'], timeLimit: 1000, memoryLimit: 256000 },
+  // j8: 基础查找算法
+  { id: 'pj12', title: '二分查找', difficulty: 'medium', knowledgePoints: ['j8'], description: '在有序数组中查找目标值的位置', inputFormat: '第一行输入n和target；第二行输入n个有序整数', outputFormat: '一行，输出索引或-1', sampleInput: '5 3\n1 2 3 4 5', sampleOutput: '2', testCases: [{ input: '5 3\n1 2 3 4 5', output: '2' }], hints: ['每次将搜索范围缩小一半'], timeLimit: 1000, memoryLimit: 256000 },
+  // j9: 基础数论
+  { id: 'pj13', title: '质数判断', difficulty: 'easy', knowledgePoints: ['j9'], description: '判断一个数是否为质数', inputFormat: '一行，整数n（2<=n<=10^6）', outputFormat: 'YES或NO', sampleInput: '7', sampleOutput: 'YES', testCases: [{ input: '7', output: 'YES' }, { input: '10', output: 'NO' }], hints: ['检查到sqrt(n)即可'], timeLimit: 1000, memoryLimit: 256000 },
+  // j10: 模拟与枚举
+  { id: 'pj14', title: '鸡兔同笼', difficulty: 'easy', knowledgePoints: ['j10'], description: '鸡兔同笼，已知头数和脚数', inputFormat: '一行，两个整数h和f', outputFormat: '鸡的数量和兔的数量', sampleInput: '35 94', sampleOutput: '23 12', testCases: [{ input: '35 94', output: '23 12' }], hints: ['列方程求解'], timeLimit: 1000, memoryLimit: 256000 },
+
   // ============ CSP-S 提高组 ============
-  // kp10: 递归与分治
-  {
-    id: 'p13',
-    title: '快速幂',
-    difficulty: 'medium',
-    knowledgePoints: ['kp10'],
-    description: '计算a的b次幂对mod取模的结果。',
-    inputFormat: '一行，三个整数a, b, mod，用空格分隔（1<=a,b,mod<=10^9）。',
-    outputFormat: '一行，输出a^b mod mod的结果。',
-    sampleInput: '2 10 1000',
-    sampleOutput: '24',
-    testCases: [
-      { input: '2 10 1000', output: '24' },
-      { input: '3 5 100', output: '43' },
-    ],
-    hints: ['使用分治思想，将b分为奇数和偶数处理'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp11: 栈与队列
-  {
-    id: 'p14',
-    title: '括号匹配',
-    difficulty: 'medium',
-    knowledgePoints: ['kp11'],
-    description: '判断一个只包含()[]{}的字符串是否括号匹配。',
-    inputFormat: '一行，一个字符串（长度不超过1000）。',
-    outputFormat: '一行，如果匹配输出YES，否则输出NO。',
-    sampleInput: '()[]{}',
-    sampleOutput: 'YES',
-    testCases: [
-      { input: '()[]{}', output: 'YES' },
-      { input: '([)]', output: 'NO' },
-      { input: '((())', output: 'NO' },
-    ],
-    hints: ['使用栈，左括号入栈，右括号时弹出匹配'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp12: 链表
-  {
-    id: 'p15',
-    title: '链表反转',
-    difficulty: 'medium',
-    knowledgePoints: ['kp12'],
-    description: '反转一个单链表。',
-    inputFormat: '第一行输入整数n（1<=n<=1000）；第二行输入n个整数。',
-    outputFormat: '一行，输出反转后的链表，用空格分隔。',
-    sampleInput: '5\n1 2 3 4 5',
-    sampleOutput: '5 4 3 2 1',
-    testCases: [
-      { input: '5\n1 2 3 4 5', output: '5 4 3 2 1' },
-      { input: '3\n1 2 3', output: '3 2 1' },
-    ],
-    hints: ['遍历链表时改变指针方向'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp13: 二叉树
-  {
-    id: 'p16',
-    title: '二叉树遍历',
-    difficulty: 'medium',
-    knowledgePoints: ['kp13'],
-    description: '给定二叉树的前序和中序遍历序列，构建二叉树并输出后序遍历。',
-    inputFormat: '第一行输入整数n；第二行输入前序遍历序列；第三行输入中序遍历序列。',
-    outputFormat: '一行，输出后序遍历序列，用空格分隔。',
-    sampleInput: '3\n1 2 3\n2 1 3',
-    sampleOutput: '2 3 1',
-    testCases: [
-      { input: '3\n1 2 3\n2 1 3', output: '2 3 1' },
-    ],
-    hints: ['前序找根，中序分左右子树，递归构建'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp14: 图的基础
-  {
-    id: 'p17',
-    title: '图的DFS遍历',
-    difficulty: 'medium',
-    knowledgePoints: ['kp14'],
-    description: '给定一个无向图和起点，输出DFS遍历顺序。',
-    inputFormat: '第一行输入n, m, s（顶点数、边数、起点）；接下来m行每行两个整数表示一条无向边。',
-    outputFormat: '一行，输出从起点出发的DFS遍历顺序，节点之间用空格分隔。',
-    sampleInput: '5 4 1\n1 2\n1 3\n2 4\n2 5',
-    sampleOutput: '1 2 4 5 3',
-    testCases: [
-      { input: '5 4 1\n1 2\n1 3\n2 4\n2 5', output: '1 2 4 5 3' },
-    ],
-    hints: ['使用递归或栈实现DFS，注意标记已访问节点'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp15: 最短路径
-  {
-    id: 'p18',
-    title: '单源最短路径',
-    difficulty: 'medium',
-    knowledgePoints: ['kp15'],
-    description: '使用Dijkstra算法求图中从起点到其他所有点的最短路径长度。',
-    inputFormat: '第一行输入n, m（顶点数、边数）；接下来m行每行三个整数u, v, w表示一条从u到v的有向边，权重为w。',
-    outputFormat: '输出n行，第i行表示从起点到顶点i的最短距离（如果不可达输出-1）。',
-    sampleInput: '4 5 1\n1 2 2\n1 3 5\n2 3 1\n2 4 3\n3 4 2',
-    sampleOutput: '0\n2\n3\n5',
-    testCases: [
-      { input: '4 5 1\n1 2 2\n1 3 5\n2 3 1\n2 4 3\n3 4 2', output: '0\n2\n3\n5' },
-    ],
-    hints: ['使用优先队列优化，或朴素实现'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp16: 最小生成树
-  {
-    id: 'p19',
-    title: '最小生成树',
-    difficulty: 'medium',
-    knowledgePoints: ['kp16'],
-    description: '使用Prim算法或Kruskal算法求图的最小生成树的总权重。',
-    inputFormat: '第一行输入n, m（顶点数、边数）；接下来m行每行三个整数u, v, w表示一条无向边，权重为w。',
-    outputFormat: '一行，输出最小生成树的总权重，如果图不连通输出-1。',
-    sampleInput: '4 5\n1 2 1\n1 3 4\n2 3 3\n2 4 2\n3 4 5',
-    sampleOutput: '6',
-    testCases: [
-      { input: '4 5\n1 2 1\n1 3 4\n2 3 3\n2 4 2\n3 4 5', output: '6' },
-    ],
-    hints: ['Kruskal按边权排序，用并查集判断是否成环'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp17: 动态规划
-  {
-    id: 'p20',
-    title: '斐波那契数列',
-    difficulty: 'medium',
-    knowledgePoints: ['kp17'],
-    description: '求斐波那契数列的第n项（使用动态规划优化）。',
-    inputFormat: '一行，输入整数n（1<=n<=40）。',
-    outputFormat: '一行，输出斐波那契数列第n项的值。',
-    sampleInput: '10',
-    sampleOutput: '55',
-    testCases: [
-      { input: '10', output: '55' },
-      { input: '5', output: '5' },
-    ],
-    hints: ['使用滚动数组优化空间复杂度'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  {
-    id: 'p21',
-    title: '最大子段和',
-    difficulty: 'hard',
-    knowledgePoints: ['kp17'],
-    description: '给定一个整数数组，找出和最大的连续子数组。',
-    inputFormat: '第一行输入整数n；第二行输入n个整数。',
-    outputFormat: '一行，输出最大子数组和。',
-    sampleInput: '9\n-2 1 -3 4 -1 2 1 -5 4',
-    sampleOutput: '6',
-    testCases: [
-      { input: '9\n-2 1 -3 4 -1 2 1 -5 4', output: '6' },
-      { input: '3\n-1 -2 -3', output: '-1' },
-    ],
-    hints: ['使用Kadane算法：dp[i]表示以i结尾的最大子段和'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp18: 贪心算法
-  {
-    id: 'p22',
-    title: '活动选择问题',
-    difficulty: 'medium',
-    knowledgePoints: ['kp18'],
-    description: '选择尽可能多的不重叠活动。',
-    inputFormat: '第一行输入整数n；接下来n行每行两个整数s, e表示活动的开始和结束时间。',
-    outputFormat: '一行，输出能选择的最大活动数量。',
-    sampleInput: '4\n1 3\n2 4\n3 5\n5 7',
-    sampleOutput: '3',
-    testCases: [
-      { input: '4\n1 3\n2 4\n3 5\n5 7', output: '3' },
-    ],
-    hints: ['按结束时间排序，优先选择最早结束的活动'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp19: 搜索与剪枝
-  {
-    id: 'p23',
-    title: '全排列',
-    difficulty: 'medium',
-    knowledgePoints: ['kp19'],
-    description: '生成1到n的所有全排列。',
-    inputFormat: '一行，输入整数n（1<=n<=8）。',
-    outputFormat: '输出所有全排列，每行一个，数字之间用空格分隔。',
-    sampleInput: '3',
-    sampleOutput: '1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1',
-    testCases: [
-      { input: '3', output: '1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1' },
-    ],
-    hints: ['使用DFS回溯生成全排列'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
-  // kp20: 组合数学基础
-  {
-    id: 'p24',
-    title: '计算排列数',
-    difficulty: 'medium',
-    knowledgePoints: ['kp20'],
-    description: '计算排列数 A(n,m) = n!/(n-m)!',
-    inputFormat: '一行，两个整数n, m（0<=m<=n<=20）。',
-    outputFormat: '一行，输出A(n,m)的结果。',
-    sampleInput: '5 2',
-    sampleOutput: '20',
-    testCases: [
-      { input: '5 2', output: '20' },
-      { input: '10 3', output: '720' },
-    ],
-    hints: ['注意数据范围，使用long long'],
-    timeLimit: 1000,
-    memoryLimit: 256000,
-  },
+  // s1: 递归与分治
+  { id: 'ps1', title: '快速幂', difficulty: 'medium', knowledgePoints: ['s1'], description: '计算a的b次幂对mod取模', inputFormat: '一行，三个整数a, b, mod', outputFormat: '一行，输出结果', sampleInput: '2 10 1000', sampleOutput: '24', testCases: [{ input: '2 10 1000', output: '24' }], hints: ['使用分治思想'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'ps2', title: '归并排序', difficulty: 'medium', knowledgePoints: ['s1'], description: '使用归并排序对数组排序', inputFormat: '第一行输入n；第二行输入n个整数', outputFormat: '一行，输出排序后的数组', sampleInput: '5\n3 1 4 1 5', sampleOutput: '1 1 3 4 5', testCases: [{ input: '5\n3 1 4 1 5', output: '1 1 3 4 5' }], hints: ['分治：先排序左右半部分，再合并'], timeLimit: 1000, memoryLimit: 256000 },
+  // s2: 栈与队列
+  { id: 'ps3', title: '括号匹配', difficulty: 'medium', knowledgePoints: ['s2'], description: '判断字符串是否括号匹配', inputFormat: '一行，字符串', outputFormat: 'YES或NO', sampleInput: '()[]{}', sampleOutput: 'YES', testCases: [{ input: '()[]{}', output: 'YES' }, { input: '([)]', output: 'NO' }], hints: ['使用栈，左括号入栈'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'ps4', title: '队列实现', difficulty: 'medium', knowledgePoints: ['s2'], description: '用两个栈实现队列', inputFormat: '多行操作命令', outputFormat: '输出操作结果', sampleInput: 'push 1\npush 2\npop\npop', sampleOutput: '1', testCases: [{ input: 'push 1\npush 2\npop\npop', output: '1' }], hints: ['一个栈入队，一个栈出队'], timeLimit: 1000, memoryLimit: 256000 },
+  // s3: 链表
+  { id: 'ps5', title: '链表反转', difficulty: 'medium', knowledgePoints: ['s3'], description: '反转一个单链表', inputFormat: '第一行输入n；第二行输入n个整数', outputFormat: '输出反转后的链表', sampleInput: '5\n1 2 3 4 5', sampleOutput: '5 4 3 2 1', testCases: [{ input: '5\n1 2 3 4 5', output: '5 4 3 2 1' }], hints: ['遍历时改变指针方向'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'ps6', title: '链表合并', difficulty: 'medium', knowledgePoints: ['s3'], description: '合并两个有序链表', inputFormat: '两行，每行若干有序整数', outputFormat: '一行，合并后的有序链表', sampleInput: '1 3 5\n2 4 6', sampleOutput: '1 2 3 4 5 6', testCases: [{ input: '1 3 5\n2 4 6', output: '1 2 3 4 5 6' }], hints: ['双指针合并'], timeLimit: 1000, memoryLimit: 256000 },
+  // s4: 二叉树
+  { id: 'ps7', title: '二叉树遍历', difficulty: 'medium', knowledgePoints: ['s4'], description: '给定前序和中序遍历，构建二叉树并输出后序', inputFormat: 'n\n前序\n中序', outputFormat: '后序遍历', sampleInput: '3\n1 2 3\n2 1 3', sampleOutput: '2 3 1', testCases: [{ input: '3\n1 2 3\n2 1 3', output: '2 3 1' }], hints: ['前序找根，中序分左右'], timeLimit: 1000, memoryLimit: 256000 },
+  // s5: 图的存储与遍历
+  { id: 'ps8', title: '图的DFS遍历', difficulty: 'medium', knowledgePoints: ['s5'], description: '给定图和起点，输出DFS遍历顺序', inputFormat: 'n m s\nm条边', outputFormat: 'DFS顺序', sampleInput: '5 4 1\n1 2\n1 3\n2 4\n2 5', sampleOutput: '1 2 4 5 3', testCases: [{ input: '5 4 1\n1 2\n1 3\n2 4\n2 5', output: '1 2 4 5 3' }], hints: ['使用递归或栈'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'ps9', title: '图的BFS遍历', difficulty: 'medium', knowledgePoints: ['s5'], description: '给定图和起点，输出BFS遍历顺序', inputFormat: 'n m s\nm条边', outputFormat: 'BFS顺序', sampleInput: '5 4 1\n1 2\n1 3\n2 4\n2 5', sampleOutput: '1 2 3 4 5', testCases: [{ input: '5 4 1\n1 2\n1 3\n2 4\n2 5', output: '1 2 3 4 5' }], hints: ['使用队列'], timeLimit: 1000, memoryLimit: 256000 },
+  // s6: 最短路径
+  { id: 'ps10', title: 'Dijkstra最短路', difficulty: 'hard', knowledgePoints: ['s6'], description: '使用Dijkstra算法求单源最短路径', inputFormat: 'n m s\nm条边', outputFormat: '到各点的最短距离', sampleInput: '4 5 1\n1 2 2\n1 3 5\n2 3 1\n2 4 3\n3 4 2', sampleOutput: '0\n2\n3\n5', testCases: [{ input: '4 5 1\n1 2 2\n1 3 5\n2 3 1\n2 4 3\n3 4 2', output: '0\n2\n3\n5' }], hints: ['使用优先队列优化'], timeLimit: 1000, memoryLimit: 256000 },
+  // s7: 最小生成树
+  { id: 'ps11', title: 'Kruskal最小生成树', difficulty: 'hard', knowledgePoints: ['s7'], description: '使用Kruskal算法求最小生成树总权重', inputFormat: 'n m\nm条边', outputFormat: 'MST总权重', sampleInput: '4 5\n1 2 1\n1 3 4\n2 3 3\n2 4 2\n3 4 5', sampleOutput: '6', testCases: [{ input: '4 5\n1 2 1\n1 3 4\n2 3 3\n2 4 2\n3 4 5', output: '6' }], hints: ['按边权排序，用并查集'], timeLimit: 1000, memoryLimit: 256000 },
+  // s8: 动态规划基础
+  { id: 'ps12', title: '斐波那契数列', difficulty: 'medium', knowledgePoints: ['s8'], description: '求斐波那契数列第n项', inputFormat: '一行，n', outputFormat: '第n项的值', sampleInput: '10', sampleOutput: '55', testCases: [{ input: '10', output: '55' }], hints: ['使用滚动数组优化'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'ps13', title: '最大子段和', difficulty: 'hard', knowledgePoints: ['s8'], description: '求最大连续子数组和', inputFormat: 'n\nn个整数', outputFormat: '最大和', sampleInput: '9\n-2 1 -3 4 -1 2 1 -5 4', sampleOutput: '6', testCases: [{ input: '9\n-2 1 -3 4 -1 2 1 -5 4', output: '6' }], hints: ['使用Kadane算法'], timeLimit: 1000, memoryLimit: 256000 },
+  // s9: 动态规划进阶
+  { id: 'ps14', title: '0-1背包', difficulty: 'hard', knowledgePoints: ['s9'], description: '0-1背包问题', inputFormat: 'n m\nn个物品的重量和价值', outputFormat: '最大价值', sampleInput: '4 8\n2 3\n3 4\n4 5\n5 6', sampleOutput: '8', testCases: [{ input: '4 8\n2 3\n3 4\n4 5\n5 6', output: '8' }], hints: ['dp[i][j]表示前i个物品容量j的最大价值'], timeLimit: 1000, memoryLimit: 256000 },
+  { id: 'ps15', title: '最长公共子序列', difficulty: 'hard', knowledgePoints: ['s9'], description: '求两个字符串的最长公共子序列长度', inputFormat: '两行，每行一个字符串', outputFormat: 'LCS长度', sampleInput: 'abcde\nace', sampleOutput: '3', testCases: [{ input: 'abcde\nace', output: '3' }], hints: ['dp[i][j]表示前i和前j个字符的LCS'], timeLimit: 1000, memoryLimit: 256000 },
+  // s10: 贪心算法
+  { id: 'ps16', title: '活动选择', difficulty: 'hard', knowledgePoints: ['s10'], description: '选择最多不重叠的活动', inputFormat: 'n\nn个活动的起止时间', outputFormat: '最大活动数', sampleInput: '4\n1 3\n2 4\n3 5\n5 7', sampleOutput: '3', testCases: [{ input: '4\n1 3\n2 4\n3 5\n5 7', output: '3' }], hints: ['按结束时间排序'], timeLimit: 1000, memoryLimit: 256000 },
+  // s11: 搜索与剪枝
+  { id: 'ps17', title: '全排列', difficulty: 'medium', knowledgePoints: ['s11'], description: '生成1到n的所有全排列', inputFormat: '一行，n', outputFormat: '所有排列', sampleInput: '3', sampleOutput: '1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1', testCases: [{ input: '3', output: '1 2 3' }], hints: ['DFS回溯'], timeLimit: 1000, memoryLimit: 256000 },
+  // s12: 高级数论
+  { id: 'ps18', title: '扩展欧几里得', difficulty: 'hard', knowledgePoints: ['s12'], description: '求ax+by=gcd(a,b)的解', inputFormat: '一行，a b', outputFormat: 'x y gcd', sampleInput: '4 6', sampleOutput: '-1 1 2', testCases: [{ input: '4 6', output: '-1 1 2' }], hints: ['递归求解'], timeLimit: 1000, memoryLimit: 256000 },
+  // s13: 组合数学
+  { id: 'ps19', title: '计算组合数', difficulty: 'hard', knowledgePoints: ['s13'], description: '计算C(n,m)对mod取模', inputFormat: '一行，n m mod', outputFormat: 'C(n,m) % mod', sampleInput: '5 2 1000', sampleOutput: '10', testCases: [{ input: '5 2 1000', output: '10' }], hints: ['使用杨辉三角或阶乘'], timeLimit: 1000, memoryLimit: 256000 },
+  // s14: 哈希与集合
+  { id: 'ps20', title: '两数之和', difficulty: 'medium', knowledgePoints: ['s14'], description: '在数组中找和为目标值的两个数', inputFormat: 'n target\nn个整数', outputFormat: '两个数的下标', sampleInput: '4 9\n2 7 11 15', sampleOutput: '0 1', testCases: [{ input: '4 9\n2 7 11 15', output: '0 1' }], hints: ['使用哈希表O(n)解决'], timeLimit: 1000, memoryLimit: 256000 },
 ];
 
 export const getProblemById = (id: string): Problem | undefined => {
