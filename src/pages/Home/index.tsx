@@ -189,16 +189,12 @@ export const Home = () => {
               >
                 <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Button 
+                    variant="ghost"
                     size="lg" 
                     className="bg-white text-primary-700 hover:bg-white/95 shadow-xl px-10 py-4 rounded-xl font-semibold"
                     onClick={() => navigate('/diagnosis')}
                   >
-                    <motion.div
-                      animate={{ rotate: [0, 10, -10, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      <Zap className="mr-2" size={22} />
-                    </motion.div>
+                    <Zap className="mr-2" size={22} />
                     开始诊断
                   </Button>
                 </motion.div>
