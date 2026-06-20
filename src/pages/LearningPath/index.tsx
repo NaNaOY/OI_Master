@@ -6,6 +6,7 @@ import { ProgressBar } from '@/components/common/ProgressBar';
 import { useUserStore } from '@/store/useUserStore';
 import { getLearningPathByLevel } from '@/data/learningPath';
 import { getKnowledgePointById } from '@/data/knowledgePoints';
+import { getProblemsByKnowledgePoint } from '@/data/problems';
 import { getMasteryColor, getMasteryLevel, getKnowledgePointName } from '@/utils/analysis';
 import { Link, useParams } from 'react-router-dom';
 
@@ -73,7 +74,7 @@ export const LearningPath = () => {
             const unlocked = isUnlocked(node.id, node.prerequisites);
             const mastery = progress?.masteryLevel || 0;
             const completed = progress?.completedProblems || 0;
-            const required = node.unlockCondition.requiredProblems;
+            const totalProblems = getProblemsByKnowledgePoint(node.knowledgePointId).length;
             
             return (
               <motion.div
@@ -136,7 +137,7 @@ export const LearningPath = () => {
                           </div>
                           <div className="text-right">
                             <p className="text-sm font-medium text-gray-700">
-                              {completed}/{required} 题
+                              {completed}/{totalProblems} 题
                             </p>
                             <p className="text-xs text-gray-500">完成进度</p>
                           </div>
