@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Award, BookOpen, CheckCircle, Sparkles, Star, Target, TrendingUp } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Award, BookOpen, ChevronLeft, ChevronRight, CheckCircle, Sparkles, Star, Target, TrendingUp } from 'lucide-react';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { RadarChart } from '@/components/charts/RadarChart';
@@ -8,6 +8,7 @@ import { useUserStore } from '@/store/useUserStore';
 import { getKnowledgePointName, getMasteryColor, getMasteryLevel } from '@/utils/analysis';
 import { knowledgePoints } from '@/data/knowledgePoints';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useRef } from 'react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -18,12 +19,11 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  hidden: { opacity: 0, y: 20 },
   visible: { 
     opacity: 1, 
     y: 0, 
-    scale: 1, 
-    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } 
+    transition: { duration: 0.5 } 
   }
 };
 
@@ -31,8 +31,11 @@ export const DiagnosisReport = () => {
   const { id } = useParams<{ id: string }>();
   const { userData } = useUserStore();
   const navigate = useNavigate();
-  const latestDiagnosis = userData.diagnosisHistory[userData.diagnosisHistory.length - 1];
+  const weakPointsRef = useRef<HTMLDivElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
   
+  const latestDiagnosis = userData.diagnosisHistory[userData.diagnosisHistory.length - 1];
   const diagnosis = id === 'latest' ? latestDiagnosis : userData.diagnosisHistory.find(d => d.id === id) || latestDiagnosis;
   
   if (!diagnosis) {
@@ -85,13 +88,23 @@ export const DiagnosisReport = () => {
   const weakPoints = sortedKP.filter(item => item.score < 60);
   
   const avgScore = Math.round(Object.values(diagnosis.scores).reduce((a, b) => a + b, 0) / Object.keys(diagnosis.scores).length);
+
+  const scroll = (ref: React.RefObject<HTMLDivElement>, direction: 'left' | 'right') => {
+    if (ref.current) {
+      const scrollAmount = 300;
+      ref.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
   
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
+      className="space-y-6"
     >
       <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
@@ -101,10 +114,7 @@ export const DiagnosisReport = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+            <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
               <Star size={20} className="text-amber-500" />
             </motion.div>
             <span className="text-sm text-neutral-500 font-medium">诊断报告</span>
@@ -139,7 +149,6 @@ export const DiagnosisReport = () => {
             key={stat.label}
             variants={itemVariants}
             whileHover={{ y: -6, scale: 1.02 }}
-            transition={{ duration: 0.3 }}
           >
             <Card className="p-5 text-center overflow-hidden relative border border-neutral-100/50 shadow-md rounded-xl">
               <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}`} />
@@ -165,10 +174,10 @@ export const DiagnosisReport = () => {
       </motion.div>
       
       <motion.div 
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
         variants={containerVariants}
       >
-        <motion.div variants={itemVariants} className="lg:col-span-2">
+        <motion.div variants={itemVariants}>
           <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">
             <motion.h3 
               className="font-bold text-neutral-800 mb-4 flex items-center gap-3"
@@ -178,14 +187,14 @@ export const DiagnosisReport = () => {
               <TrendingUp size={20} className="text-blue-500" />
               知识点掌握度雷达图
             </motion.h3>
-            <div className="h-[320px]">
+            <div className="h-[280px]">
               <RadarChart data={radarData} />
             </div>
           </Card>
         </motion.div>
         
         <motion.div variants={itemVariants}>
-          <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">
+          <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl h-full flex flex-col">
             <motion.h3 
               className="font-bold text-neutral-800 mb-4 flex items-center gap-3"
               initial={{ opacity: 0 }}
@@ -195,38 +204,73 @@ export const DiagnosisReport = () => {
               薄弱知识点
             </motion.h3>
             
-            {weakPoints.length > 0 ? (
-              <motion.div className="space-y-3">
-                {weakPoints.map((item) => (
-                  <motion.div
-                    key={item.kpId}
-                    variants={itemVariants}
-                    whileHover={{ x: 4 }}
-                    className="p-3 rounded-xl bg-red-50/50 border border-red-100"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-neutral-700 text-sm">{item.kp?.name}</span>
-                      <span className="text-sm font-bold text-red-600">{item.score}%</span>
-                    </div>
-                    <ProgressBar
-                      value={item.score}
-                      color={getMasteryColor(item.score)}
-                      className="h-2 rounded-full"
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div className="text-center py-8">
-                <motion.div
-                  className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+            <div className="flex-1 overflow-hidden">
+              <div 
+                ref={weakPointsRef}
+                className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {weakPoints.length > 0 ? (
+                  weakPoints.map((item) => (
+                    <motion.div
+                      key={item.kpId}
+                      variants={itemVariants}
+                      whileHover={{ y: -4, scale: 1.02 }}
+                      className="flex-shrink-0 w-64 p-4 rounded-xl bg-red-50/50 border border-red-100"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-medium text-neutral-700">{item.kp?.name}</span>
+                        <span className="text-sm font-bold text-red-600">{item.score}%</span>
+                      </div>
+                      <ProgressBar
+                        value={item.score}
+                        color={getMasteryColor(item.score)}
+                        className="h-2 rounded-full"
+                      />
+                      <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded-full font-medium`}
+                        style={{
+                          backgroundColor: `${getMasteryColor(item.score)}15`,
+                          color: getMasteryColor(item.score),
+                        }}
+                      >
+                        {getMasteryLevel(item.score)}
+                      </span>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="flex-shrink-0 w-full text-center py-8">
+                    <motion.div
+                      className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <CheckCircle size={24} className="text-emerald-500" />
+                    </motion.div>
+                    <p className="text-emerald-600 font-semibold">太棒了！没有薄弱项</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {weakPoints.length > 3 && (
+              <div className="flex justify-center gap-2 mt-3 pt-3 border-t border-neutral-100">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="p-2 rounded-full hover:bg-neutral-100"
+                  onClick={() => scroll(weakPointsRef, 'left')}
                 >
-                  <CheckCircle size={24} className="text-emerald-500" />
-                </motion.div>
-                <p className="text-emerald-600 font-semibold">太棒了！没有薄弱项</p>
-              </motion.div>
+                  <ChevronLeft size={18} />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="p-2 rounded-full hover:bg-neutral-100"
+                  onClick={() => scroll(weakPointsRef, 'right')}
+                >
+                  <ChevronRight size={18} />
+                </Button>
+              </div>
             )}
           </Card>
         </motion.div>
@@ -243,21 +287,50 @@ export const DiagnosisReport = () => {
             学习建议
           </motion.h3>
           
-          <motion.div className="space-y-3">
-            {diagnosis.recommendations.map((recommendation, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                whileHover={{ x: 4 }}
-                className="flex items-start gap-3 p-4 bg-primary-50/50 rounded-xl border border-primary-100"
+          <div className="overflow-hidden">
+            <div 
+              ref={suggestionsRef}
+              className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {diagnosis.recommendations.map((recommendation, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  className="flex-shrink-0 w-80 p-4 bg-primary-50/50 rounded-xl border border-primary-100"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-indigo-500 text-white text-sm font-bold flex items-center justify-center">
+                      {index + 1}
+                    </span>
+                    <span className="text-neutral-700 text-sm leading-relaxed">{recommendation}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+          
+          {diagnosis.recommendations.length > 3 && (
+            <div className="flex justify-center gap-2 mt-3 pt-3 border-t border-neutral-100">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="p-2 rounded-full hover:bg-neutral-100"
+                onClick={() => scroll(suggestionsRef, 'left')}
               >
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-indigo-500 text-white text-sm font-bold flex items-center justify-center">
-                  {index + 1}
-                </span>
-                <span className="text-neutral-700 text-sm leading-relaxed">{recommendation}</span>
-              </motion.div>
-            ))}
-          </motion.div>
+                <ChevronLeft size={18} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="p-2 rounded-full hover:bg-neutral-100"
+                onClick={() => scroll(suggestionsRef, 'right')}
+              >
+                <ChevronRight size={18} />
+              </Button>
+            </div>
+          )}
         </Card>
       </motion.div>
       
@@ -271,36 +344,63 @@ export const DiagnosisReport = () => {
             知识点详细分析
           </motion.h3>
           
-          <motion.div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-            {sortedKP.map((item) => (
-              <motion.div
-                key={item.kpId}
-                variants={itemVariants}
-                whileHover={{ y: -2 }}
-                className="p-4 rounded-xl bg-neutral-50/50 border border-neutral-100"
+          <div className="overflow-hidden">
+            <div 
+              ref={detailsRef}
+              className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {sortedKP.map((item) => (
+                <motion.div
+                  key={item.kpId}
+                  variants={itemVariants}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  className="flex-shrink-0 w-48 p-4 rounded-xl bg-neutral-50/50 border border-neutral-100"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-medium text-neutral-700 text-sm">{item.kp?.name}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium`}
+                      style={{
+                        backgroundColor: `${getMasteryColor(item.score)}15`,
+                        color: getMasteryColor(item.score),
+                      }}
+                    >
+                      {getMasteryLevel(item.score)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ProgressBar
+                      value={item.score}
+                      color={getMasteryColor(item.score)}
+                      className="flex-1 h-2 rounded-full"
+                    />
+                    <span className="text-sm font-bold text-neutral-600 w-8 text-right tabular-nums">{item.score}%</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+          
+          {sortedKP.length > 5 && (
+            <div className="flex justify-center gap-2 mt-3 pt-3 border-t border-neutral-100">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="p-2 rounded-full hover:bg-neutral-100"
+                onClick={() => scroll(detailsRef, 'left')}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-neutral-700 text-sm">{item.kp?.name}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium`}
-                    style={{
-                      backgroundColor: `${getMasteryColor(item.score)}15`,
-                      color: getMasteryColor(item.score),
-                    }}
-                  >
-                    {getMasteryLevel(item.score)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <ProgressBar
-                    value={item.score}
-                    color={getMasteryColor(item.score)}
-                    className="flex-1 h-2 rounded-full"
-                  />
-                  <span className="text-sm font-bold text-neutral-600 w-10 text-right tabular-nums">{item.score}%</span>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                <ChevronLeft size={18} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="p-2 rounded-full hover:bg-neutral-100"
+                onClick={() => scroll(detailsRef, 'right')}
+              >
+                <ChevronRight size={18} />
+              </Button>
+            </div>
+          )}
         </Card>
       </motion.div>
       
