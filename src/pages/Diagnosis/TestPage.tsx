@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 export const DiagnosisTest = () => {
   const { level } = useParams<{ level: 'CSP-J' | 'CSP-S' }>();
   const navigate = useNavigate();
-  const { questions, currentQuestionIndex, answers, submitAnswer, prevQuestion, completeDiagnosis } = useDiagnosisStore();
+  const { questions, currentQuestionIndex, answers, submitAnswer, prevQuestion, nextQuestion, completeDiagnosis } = useDiagnosisStore();
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [showResult, setShowResult] = useState(false);
   
@@ -34,6 +34,14 @@ export const DiagnosisTest = () => {
     if (!selectedAnswer) return;
     submitAnswer(selectedAnswer);
     setShowResult(true);
+  };
+  
+  const handleNext = () => {
+    if (!showResult && !selectedAnswer) return;
+    if (!showResult) {
+      submitAnswer(selectedAnswer);
+    }
+    nextQuestion();
   };
   
   const handleComplete = () => {
@@ -201,10 +209,19 @@ export const DiagnosisTest = () => {
         </Button>
         
         {currentQuestionIndex < questions.length - 1 ? (
-          <Button onClick={handleSubmit}>
-            {showResult ? '下一题' : '提交答案'}
-            <ChevronRight size={20} className="ml-2" />
-          </Button>
+          <div className="flex gap-2">
+            {!showResult ? (
+              <Button onClick={handleSubmit}>
+                提交答案
+                <CheckCircle size={20} className="ml-2" />
+              </Button>
+            ) : (
+              <Button onClick={handleNext}>
+                下一题
+                <ChevronRight size={20} className="ml-2" />
+              </Button>
+            )}
+          </div>
         ) : (
           <Button onClick={handleComplete}>
             完成测试
