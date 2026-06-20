@@ -112,7 +112,7 @@ export const recommendDailyProblems = (userData: UserLearningData): Problem[] =>
   
   const completedIds = new Set(completedProblems.map(cp => cp.problemId));
   
-  const recommendedProblems = problems
+  let recommendedProblems = problems
     .filter(p => {
       if (completedIds.has(p.id)) return false;
       return p.knowledgePoints.some(kp => targetKnowledgePoints.includes(kp));
@@ -120,17 +120,17 @@ export const recommendDailyProblems = (userData: UserLearningData): Problem[] =>
     .sort((a, b) => {
       const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
       return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
-    })
-    .slice(0, 5);
+    });
   
-  if (recommendedProblems.length === 0) {
-    return problems
-      .filter(p => !completedIds.has(p.id))
+  if (recommendedProblems.length < 5) {
+    const additionalProblems = problems
+      .filter(p => !completedIds.has(p.id) && !recommendedProblems.find(rp => rp.id === p.id))
       .sort((a, b) => {
         const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
         return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
-      })
-      .slice(0, 5);
+      });
+    
+    recommendedProblems = [...recommendedProblems, ...additionalProblems].slice(0, 5);
   }
   
   return recommendedProblems;
