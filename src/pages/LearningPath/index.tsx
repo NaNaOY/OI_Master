@@ -1,10 +1,10 @@
+import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { getKnowledgePointById } from '@/data/knowledgePoints';
 import { getLearningPathByLevel } from '@/data/learningPath';
 import { useUserStore } from '@/store/useUserStore';
-import { getKnowledgePointName } from '@/utils/analysis';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, CheckCircle, Lock, Sparkles, Star, Target, Zap } from 'lucide-react';
+import { BookOpen, CheckCircle, Sparkles, Star, Target, Zap } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 
 const containerVariants = {
@@ -317,21 +317,19 @@ export const LearningPath = () => {
                       {kp?.description}
                     </motion.p>
                     
-                    {!unlocked && (
-                      <motion.div 
-                        className="flex items-center gap-3 text-sm text-neutral-400 bg-neutral-50 p-3 rounded-xl"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                      >
-                        <motion.div
-                          animate={{ rotate: [0, 10, -10, 0] }}
-                          transition={{ duration: 2, repeat: Infinity }}
+                    {/* 查看题单按钮 */}
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Link to={`/learning-path/kp/${node.knowledgePointId}`}>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="shrink-0 px-4 py-2 rounded-xl font-medium border-primary-200 text-primary-600 hover:bg-primary-50"
                         >
-                          <Lock size={16} />
-                        </motion.div>
-                        <span className="font-medium">需先掌握：{node.prerequisites.map(p => getKnowledgePointName(p)).join('、')}</span>
-                      </motion.div>
-                    )}
+                          <BookOpen size={16} className="mr-1" />
+                          查看题单
+                        </Button>
+                      </Link>
+                    </motion.div>
                   </div>
                   
                 </div>

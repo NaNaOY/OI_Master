@@ -4,7 +4,7 @@ import { getRecommendedProblemsByWeakPoints } from '@/data/problemList';
 import { useUserStore } from '@/store/useUserStore';
 import { getKnowledgePointName } from '@/utils/analysis';
 import { motion } from 'framer-motion';
-import { ArrowRight, BookOpen, Calendar, Clock, ExternalLink, Sparkles, Star, Target, Trophy, Zap } from 'lucide-react';
+import { ArrowRight, BookOpen, Calendar, Check, Clock, ExternalLink, Sparkles, Star, Target, Trophy, Zap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const containerVariants = {
@@ -25,7 +25,7 @@ const itemVariants = {
 };
 
 export const DailyPractice = () => {
-  const { userData } = useUserStore();
+  const { userData, markProblemCompleted } = useUserStore();
   const navigate = useNavigate();
   
   const latestDiagnosis = userData.diagnosisHistory.length > 0 
@@ -40,8 +40,13 @@ export const DailyPractice = () => {
     ? getRecommendedProblemsByWeakPoints(latestDiagnosis.weakPoints)
     : [];
   
-  const dailyProblemCount = Math.max(3, Math.round(allRecommendedProblems.length * 0.3));
-  const recommendedProblems = allRecommendedProblems.slice(0, dailyProblemCount);
+  const completedProblemIds = userData.completedProblems.map(p => p.problemId);
+  const undonProblems = allRecommendedProblems.filter(p => !completedProblemIds.includes(p.id));
+  const recommendedProblems = undonProblems.slice(0, 3);
+  
+  const handleMarkDone = (problemId: string) => {
+    markProblemCompleted(problemId);
+  };
   
   // 根据平台获取题目链接
   const getProblemLink = (platform: string, problemId: string): string => {
@@ -215,19 +220,53 @@ export const DailyPractice = () => {
                     </div>
                   </div>
                   
-                  <motion.a
-                    href={getProblemLink(problem.platform, problem.problemId)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-indigo-500 text-white text-sm font-medium hover:from-primary-600 hover:to-indigo-600 transition-all shadow-md"
-                  >
-                    <ExternalLink size={14} />
-                    去做题
-                  </motion.a>
+                  <div className="flex items-center gap-2">
+                    <motion.button
+                      onClick={() => handleMarkDone(problem.id)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg border border-emerald-300 text-emerald-600 text-sm font-medium hover:bg-emerald-50 transition-all"
+                      title="标记为已做"
+                    >
+                      <Check size={14} />
+                      已做
+                    </motion.button>
+                    
+                    <motion.a
+                      href={getProblemLink(problem.platform, problem.problemId)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-indigo-500 text-white text-sm font-medium hover:from-primary-600 hover:to-indigo-600 transition-all shadow-md"
+                    >
+                      <ExternalLink size={14} />
+                      去做题
+                    </motion.a>
+                  </div>
                 </motion.div>
               ))}
+            </div>
+          ) : undonProblems.length === 0 && latestDiagnosis ? (
+            <div className="text-center py-12">
+              <motion.div 
+                className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center mx-auto mb-4"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Check size={24} className="text-emerald-500" />
+              </motion.div>
+              <p className="text-emerald-600 font-medium mb-2">今日推荐题目已全部完成</p>
+              <p className="text-sm text-neutral-400">太棒了！诊断报告中的所有题目都已完成</p>
+              
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="mt-6">
+                <Link to="/diagnosis">
+                  <Button className="bg-gradient-to-r from-primary-500 to-indigo-500 hover:from-primary-600 hover:to-indigo-600 shadow-lg px-6 py-3 rounded-xl">
+                    <ArrowRight size={18} className="mr-2" />
+                    查看诊断报告
+                  </Button>
+                </Link>
+              </motion.div>
             </div>
           ) : (
             <div className="text-center py-12">

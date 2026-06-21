@@ -13,6 +13,7 @@ interface UserState {
   completeDiagnosis: (level: 'CSP-J' | 'CSP-S', answers: DiagnosisAnswer[]) => DiagnosisRecord | null;
   updateStatistics: () => void;
   updateDailyRecommendations: () => void;
+  markProblemCompleted: (problemId: string) => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -143,6 +144,34 @@ export const useUserStore = create<UserState>((set, get) => ({
         ...state.userData,
         dailyRecommendedProblems: targetKnowledgePoints,
         dailyRecommendDate: todayStr,
+      },
+    }));
+    
+    get().saveUser();
+  },
+  
+  markProblemCompleted: (problemId: string) => {
+    const { completedProblems } = get().userData;
+    
+    // 检查是否已标记
+    if (completedProblems.some(p => p.problemId === problemId)) {
+      return;
+    }
+    
+    set(state => ({
+      userData: {
+        ...state.userData,
+        completedProblems: [
+          ...state.userData.completedProblems,
+          {
+            problemId,
+            completedAt: new Date().toISOString(),
+            code: '',
+            status: 'accepted',
+            executionTime: 0,
+            memoryUsage: 0,
+          },
+        ],
       },
     }));
     
