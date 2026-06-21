@@ -474,7 +474,7 @@ export const DiagnosisReport = () => {
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link to="/learning-path">
             <Button size="lg" className="bg-gradient-to-r from-primary-500 to-indigo-500 hover:from-primary-600 hover:to-indigo-600 shadow-xl px-10 py-4 rounded-xl font-semibold">
-              根据诊断结果规划学习路径
+              根据诊断结果规划练习题目
               <ArrowRight size={20} className="ml-3" />
             </Button>
           </Link>

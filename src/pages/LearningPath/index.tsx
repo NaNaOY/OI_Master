@@ -51,28 +51,8 @@ export const LearningPath = () => {
   
   const learningPath = getLearningPathByLevel(pathLevel);
   
-  const getProgress = (kpId: string) => {
-    return userData.learningProgress.find(p => p.knowledgePointId === kpId);
-  };
-  
-  const isUnlocked = (nodeIndex: number, prerequisites: string[]) => {
-    if (prerequisites.length === 0) return true;
-    
-    const hasDiagnosis = userData.diagnosisHistory.length > 0;
-    
-    if (hasDiagnosis) {
-      const latestDiagnosis = userData.diagnosisHistory[userData.diagnosisHistory.length - 1];
-      const diagnosisScore = latestDiagnosis.scores[learningPath?.nodes[nodeIndex].knowledgePointId || ''];
-      
-      if (diagnosisScore !== undefined) {
-        return true;
-      }
-    }
-    
-    return prerequisites.every(p => {
-      const progress = getProgress(p);
-      return progress && (progress.completedProblems > 0 || (progress.masteryLevel >= 60));
-    });
+  const isUnlocked = (_nodeIndex: number, _prerequisites: string[]) => {
+    return true;
   };
   
   if (!learningPath) {

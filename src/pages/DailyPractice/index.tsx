@@ -28,16 +28,20 @@ export const DailyPractice = () => {
   const { userData } = useUserStore();
   const navigate = useNavigate();
   
-  // 获取薄弱知识点
-  const weakPoints = userData.learningProgress
-    .filter(p => p.masteryLevel < 70)
-    .sort((a, b) => a.masteryLevel - b.masteryLevel)
-    .slice(0, 5);
+  const latestDiagnosis = userData.diagnosisHistory.length > 0 
+    ? userData.diagnosisHistory[userData.diagnosisHistory.length - 1]
+    : null;
   
-  // 获取推荐的题目
-  const recommendedProblems = getRecommendedProblemsByWeakPoints(
-    weakPoints.map(p => p.knowledgePointId)
-  );
+  const weakPoints = latestDiagnosis 
+    ? latestDiagnosis.weakPoints.map(kpId => ({ knowledgePointId: kpId }))
+    : [];
+  
+  const allRecommendedProblems = latestDiagnosis
+    ? getRecommendedProblemsByWeakPoints(latestDiagnosis.weakPoints)
+    : [];
+  
+  const dailyProblemCount = Math.max(3, Math.round(allRecommendedProblems.length * 0.3));
+  const recommendedProblems = allRecommendedProblems.slice(0, dailyProblemCount);
   
   // 根据平台获取题目链接
   const getProblemLink = (platform: string, problemId: string): string => {
