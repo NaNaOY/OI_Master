@@ -40,9 +40,61 @@ export const DailyPractice = () => {
     ? getRecommendedProblemsByWeakPoints(latestDiagnosis.weakPoints)
     : [];
   
+  // 获取今天的日期
+  const todayStr = new Date().toISOString().split('T')[0];
+  
+  // 从 localStorage 读取今日已推荐的题目
+  const getTodayRecommended = (): string[] => {
+    try {
+      const stored = localStorage.getItem('dailyRecommended');
+      if (stored) {
+        const data = JSON.parse(stored);
+        if (data.date === todayStr) {
+          return data.problemIds;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    return [];
+  };
+  
+  // 保存今日推荐
+  const saveTodayRecommended = (problemIds: string[]) => {
+    try {
+      localStorage.setItem('dailyRecommended', JSON.stringify({
+        date: todayStr,
+        problemIds,
+      }));
+    } catch (e) {
+      // ignore
+    }
+  };
+  
   const completedProblemIds = userData.completedProblems.map(p => p.problemId);
-  const undonProblems = allRecommendedProblems.filter(p => !completedProblemIds.includes(p.id));
-  const recommendedProblems = undonProblems.slice(0, 3);
+  const todayRecommended = getTodayRecommended();
+  
+  // 过滤掉已完成和今日已推荐的题目
+  const availableProblems = allRecommendedProblems.filter(p => 
+    !completedProblemIds.includes(p.id) && !todayRecommended.includes(p.id)
+  );
+  
+  // 如果可用题目不足3道，补充更多
+  let recommendedProblems = availableProblems.slice(0, 3);
+  
+  // 如果可用题目不足3道，补充今日推荐的题目（但还未完成的）
+  if (recommendedProblems.length < 3) {
+    const todayNotDone = allRecommendedProblems.filter(p => 
+      !completedProblemIds.includes(p.id) && todayRecommended.includes(p.id)
+    );
+    recommendedProblems = [...recommendedProblems, ...todayNotDone].slice(0, 3);
+  }
+  
+  // 保存今日推荐
+  const newTodayRecommended = Array.from(new Set([...todayRecommended, ...recommendedProblems.map(p => p.id)]));
+  if (newTodayRecommended.length > todayRecommended.length) {
+    saveTodayRecommended(newTodayRecommended);
+  }
   
   const handleMarkDone = (problemId: string) => {
     markProblemCompleted(problemId);
@@ -247,7 +299,7 @@ export const DailyPractice = () => {
                 </motion.div>
               ))}
             </div>
-          ) : undonProblems.length === 0 && latestDiagnosis ? (
+          ) : availableProblems.length === 0 && latestDiagnosis ? (
             <div className="text-center py-12">
               <motion.div 
                 className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center mx-auto mb-4"

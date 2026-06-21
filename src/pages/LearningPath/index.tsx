@@ -1,11 +1,9 @@
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
-import { getKnowledgePointById } from '@/data/knowledgePoints';
-import { getLearningPathByLevel } from '@/data/learningPath';
-import { useUserStore } from '@/store/useUserStore';
-import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, CheckCircle, Sparkles, Star, Target, Zap } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { knowledgePoints } from '@/data/knowledgePoints';
+import { motion } from 'framer-motion';
+import { BookOpen, Sparkles, Star, Target, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -43,43 +41,11 @@ const difficultyConfig = {
 };
 
 export const LearningPath = () => {
-  const { level } = useParams<{ level: 'CSP-J' | 'CSP-S' }>();
-  const { userData } = useUserStore();
-  const pathLevel = level || (userData.diagnosisHistory.length > 0 
-    ? userData.diagnosisHistory[userData.diagnosisHistory.length - 1].level 
-    : 'CSP-J');
+  const primaryGradient = 'from-blue-500 via-indigo-500 to-violet-600';
+  const primaryAccent = 'text-blue-500';
   
-  const learningPath = getLearningPathByLevel(pathLevel);
-  
-  const isUnlocked = (_nodeIndex: number, _prerequisites: string[]) => {
-    return true;
-  };
-  
-  if (!learningPath) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center min-h-[60vh]"
-      >
-        <Card className="p-12 text-center max-w-md border border-neutral-100/50 shadow-xl rounded-3xl">
-          <motion.div
-            className="w-20 h-20 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center mx-auto mb-6"
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <BookOpen className="w-10 h-10 text-neutral-400" />
-          </motion.div>
-          <h3 className="text-xl font-bold text-neutral-800 mb-3">学习路径加载失败</h3>
-          <p className="text-neutral-500 mb-8">请返回首页重新选择</p>
-        </Card>
-      </motion.div>
-    );
-  }
-  
-  const isCSPJ = pathLevel === 'CSP-J';
-  const primaryGradient = isCSPJ ? 'from-blue-500 via-indigo-500 to-violet-600' : 'from-purple-500 via-pink-500 to-rose-600';
-  const primaryAccent = isCSPJ ? 'text-blue-500' : 'text-purple-500';
+  // 合并所有知识点，包括 CSP-J 和 CSP-S
+  const allKnowledgePoints: typeof knowledgePoints = knowledgePoints;
   
   return (
     <motion.div
@@ -146,7 +112,7 @@ export const LearningPath = () => {
                   <BookOpen className="text-yellow-300" size={28} />
                 </motion.div>
                 <span className="text-white/80 text-sm font-medium tracking-wide">
-                  {isCSPJ ? 'CSP-J 入门组' : 'CSP-S 提高组'}
+                  信息学奥赛 CSP-J/S
                 </span>
               </motion.div>
               
@@ -156,7 +122,7 @@ export const LearningPath = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                {learningPath.name}
+                信息学奥赛 CSP-J/S 学习路径
               </motion.h1>
               
               <motion.p 
@@ -165,51 +131,8 @@ export const LearningPath = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                {learningPath.nodes.length} 个核心知识点 · AI 智能规划学习路径
+                {allKnowledgePoints.length} 个核心知识点 · 涵盖入门到提高
               </motion.p>
-              
-              {/* 级别切换按钮 */}
-              <motion.div 
-                className="flex gap-3"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-              >
-                {pathLevel === 'CSP-J' ? (
-                  <motion.div 
-                    className="px-6 py-2.5 rounded-xl bg-white/20 backdrop-blur-sm text-white font-bold shadow-lg"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    CSP-J
-                  </motion.div>
-                ) : (
-                  <Link to="/learning-path/level/CSP-J">
-                    <motion.div 
-                      className="px-6 py-2.5 rounded-xl bg-white/10 backdrop-blur-sm text-white/80 font-medium hover:bg-white/20 transition-all"
-                      whileHover={{ scale: 1.05, y: -2 }}
-                    >
-                      CSP-J
-                    </motion.div>
-                  </Link>
-                )}
-                {pathLevel === 'CSP-S' ? (
-                  <motion.div 
-                    className="px-6 py-2.5 rounded-xl bg-white/20 backdrop-blur-sm text-white font-bold shadow-lg"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    CSP-S
-                  </motion.div>
-                ) : (
-                  <Link to="/learning-path/level/CSP-S">
-                    <motion.div 
-                      className="px-6 py-2.5 rounded-xl bg-white/10 backdrop-blur-sm text-white/80 font-medium hover:bg-white/20 transition-all"
-                      whileHover={{ scale: 1.05, y: -2 }}
-                    >
-                      CSP-S
-                    </motion.div>
-                  </Link>
-                )}
-              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -220,15 +143,14 @@ export const LearningPath = () => {
         className="grid grid-cols-1 md:grid-cols-2 gap-5"
         variants={containerVariants}
       >
-        {learningPath.nodes.map((node, index) => {
-          const kp = getKnowledgePointById(node.knowledgePointId);
-          const unlocked = isUnlocked(index, node.prerequisites);
-          const diff = difficultyConfig[kp?.difficulty as keyof typeof difficultyConfig] || difficultyConfig[1];
+        {allKnowledgePoints.map((kp, index) => {
+          const unlocked = true;
+          const diff = difficultyConfig[kp.difficulty as keyof typeof difficultyConfig] || difficultyConfig[1];
           const isCompleted = false; // 不再追踪完成状态
           
           return (
             <motion.div
-              key={node.id}
+              key={kp.id}
               variants={itemVariants}
               whileHover={unlocked ? { y: -10, scale: 1.02 } : {}}
               transition={{ duration: 0.3 }}
@@ -278,24 +200,6 @@ export const LearningPath = () => {
                       >
                         {diff.label}
                       </motion.span>
-                      <AnimatePresence>
-                        {isCompleted && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0 }}
-                            className="flex items-center gap-1"
-                          >
-                            <motion.div
-                              animate={{ scale: [1, 1.2, 1] }}
-                              transition={{ duration: 1.5, repeat: Infinity }}
-                            >
-                              <CheckCircle size={16} className="text-emerald-500" />
-                            </motion.div>
-                            <span className="text-xs text-emerald-600 font-medium">已掌握</span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
                     </div>
                     
                     {/* 知识点名称 */}
@@ -304,7 +208,7 @@ export const LearningPath = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
-                      {kp?.name}
+                      {kp.name}
                     </motion.h3>
                     
                     {/* 描述 */}
@@ -314,12 +218,12 @@ export const LearningPath = () => {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
                     >
-                      {kp?.description}
+                      {kp.description}
                     </motion.p>
                     
                     {/* 查看题单按钮 */}
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Link to={`/learning-path/kp/${node.knowledgePointId}`}>
+                      <Link to={`/learning-path/kp/${kp.id}`}>
                         <Button 
                           variant="outline" 
                           size="sm"
