@@ -90,8 +90,8 @@ export const DiagnosisReport = () => {
     .sort((a, b) => a.score - b.score);
   
   const strongPoints = sortedKP.filter(item => item.score >= 70);
-  const weakPoints = sortedKP.filter(item => item.score < 60);
-  const mediumPoints = sortedKP.filter(item => item.score >= 60 && item.score < 70);
+  const weakPoints = sortedKP.filter(item => item.score < 70);
+  const mediumPoints = sortedKP.filter(item => item.score >= 70 && item.score < 85);
   
   const avgScore = Math.round(Object.values(diagnosis.scores).reduce((a, b) => a + b, 0) / Object.keys(diagnosis.scores).length);
   const grade = getGrade(avgScore);
@@ -421,32 +421,52 @@ export const DiagnosisReport = () => {
         </motion.div>
       )}
       
+      {/* 家长报告信息 */}
       <motion.div variants={itemVariants}>
-        <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">
-          <h3 className="font-bold text-neutral-800 mb-4">知识点掌握度列表</h3>
+        <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl bg-gradient-to-r from-violet-50/50 to-purple-50/30">
+          <div className="flex items-center gap-3 mb-6">
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <Award size={22} className="text-violet-500" />
+            </motion.div>
+            <h3 className="font-bold text-neutral-800">家长报告</h3>
+          </div>
           
-          <div className="space-y-2">
-            {sortedKP.map((item) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { title: '定期诊断', desc: '建议定期进行诊断测试，了解学习状态变化', color: 'from-blue-500 to-cyan-500' },
+              { title: '按题单练习', desc: '根据诊断推荐的题单，在洛谷等平台练习', color: 'from-green-500 to-teal-500' },
+              { title: '关注薄弱点', desc: '针对薄弱知识点加强学习，逐步提升', color: 'from-amber-500 to-orange-500' },
+            ].map((tip, i) => (
               <motion.div
-                key={item.kpId}
-                whileHover={{ x: 3 }}
-                className="flex items-center gap-4 p-3 rounded-lg hover:bg-neutral-50/50 transition-colors"
+                key={i}
+                className="p-4 rounded-xl bg-white border border-neutral-100 group hover:border-primary-200 transition-colors"
+                whileHover={{ y: -2 }}
               >
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary-50 to-indigo-50 flex items-center justify-center">
-                  <Star size={12} className="text-primary-500" />
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tip.color} flex items-center justify-center mb-2 shadow-md`}>
+                  <span className="text-white font-bold">{i + 1}</span>
                 </div>
-                <span className="flex-1 font-medium text-neutral-700 text-sm">{item.kp?.name}</span>
-                <div className="flex-1 max-w-[120px]">
-                  <ProgressBar value={item.score} color={getMasteryColor(item.score)} className="h-2 rounded-full" />
-                </div>
-                <span className={`text-sm font-bold w-10 text-right ${
-                  item.score >= 70 ? 'text-emerald-600' : item.score >= 60 ? 'text-amber-600' : 'text-red-600'
-                }`}>
-                  {item.score}%
-                </span>
+                <p className="font-medium text-neutral-800 mb-1">{tip.title}</p>
+                <p className="text-sm text-neutral-500">{tip.desc}</p>
               </motion.div>
             ))}
           </div>
+          
+          {weakPoints.length > 0 && (
+            <motion.div 
+              className="mt-4 p-4 bg-gradient-to-r from-red-50 to-rose-50 rounded-xl border border-red-200"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <p className="text-sm text-red-700">
+                <strong>重点关注：</strong>建议孩子加强以下知识点的学习：
+                {weakPoints.slice(0, 5).map(item => item.kp?.name).join('、')}
+              </p>
+            </motion.div>
+          )}
         </Card>
       </motion.div>
       

@@ -1,12 +1,9 @@
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
-import { ProgressBar } from '@/components/common/ProgressBar';
 import { getKnowledgePointById } from '@/data/knowledgePoints';
 import { getRecommendedProblemsByKnowledgePoint } from '@/data/problemList';
-import { useUserStore } from '@/store/useUserStore';
-import { getMasteryColor, getMasteryLevel } from '@/utils/analysis';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, ExternalLink, Sparkles, Star, Target, Trophy } from 'lucide-react';
+import { ArrowLeft, BookOpen, ExternalLink, Sparkles, Star, Target } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const containerVariants = {
@@ -29,14 +26,10 @@ const itemVariants = {
 
 export const KnowledgeDetail = () => {
   const { nodeId } = useParams<{ nodeId: string }>();
-  const { userData } = useUserStore();
   const navigate = useNavigate();
   
   const kp = getKnowledgePointById(nodeId || '');
   const recommendedProblems = getRecommendedProblemsByKnowledgePoint(nodeId || '');
-  const progress = userData.learningProgress.find(p => p.knowledgePointId === nodeId);
-  
-  const mastery = progress?.masteryLevel || 0;
   
   if (!kp) {
     return (
@@ -66,9 +59,6 @@ export const KnowledgeDetail = () => {
       </motion.div>
     );
   }
-  
-  const masteryColor = getMasteryColor(mastery);
-  const masteryLevel = getMasteryLevel(mastery);
   
   // 根据平台获取题目链接
   const getProblemLink = (platform: string, problemId: string): string => {
@@ -138,33 +128,7 @@ export const KnowledgeDetail = () => {
               </div>
             </div>
             
-            <p className="text-neutral-600 leading-relaxed mb-6">{kp.description}</p>
-            
-            {/* 掌握度展示 */}
-            <div className="flex items-center gap-6 p-4 rounded-xl bg-gradient-to-r from-neutral-50 to-neutral-100/50 border border-neutral-100">
-              <div className="flex items-center gap-3">
-                <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-                  <Trophy size={20} className={mastery >= 70 ? 'text-emerald-500' : mastery >= 50 ? 'text-amber-500' : 'text-red-500'} />
-                </motion.div>
-                <div>
-                  <span className="text-xs text-neutral-500">当前掌握度</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-lg" style={{ color: masteryColor }}>{mastery}%</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      mastery >= 70 ? 'bg-emerald-100 text-emerald-600' : 
-                      mastery >= 50 ? 'bg-amber-100 text-amber-600' : 
-                      'bg-red-100 text-red-600'
-                    }`}>
-                      {masteryLevel}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex-1 max-w-[200px]">
-                <ProgressBar value={mastery} color={masteryColor} className="h-2 rounded-full" />
-              </div>
-            </div>
+            <p className="text-neutral-600 leading-relaxed">{kp.description}</p>
           </div>
         </Card>
       </motion.div>
@@ -246,28 +210,10 @@ export const KnowledgeDetail = () => {
             学习建议
           </h3>
           
-          <div className="space-y-3">
-            {mastery < 50 && (
-              <div className="p-4 rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border border-red-100">
-                <p className="text-sm text-red-700">
-                  <strong>基础薄弱：</strong>建议先学习该知识点的基础概念，理解核心原理后再进行练习。
-                </p>
-              </div>
-            )}
-            {mastery >= 50 && mastery < 70 && (
-              <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100">
-                <p className="text-sm text-amber-700">
-                  <strong>需要巩固：</strong>建议多做练习题，通过实践加深对该知识点的理解。
-                </p>
-              </div>
-            )}
-            {mastery >= 70 && (
-              <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
-                <p className="text-sm text-emerald-700">
-                  <strong>掌握良好：</strong>可以尝试挑战更高难度的题目，进一步提升能力。
-                </p>
-              </div>
-            )}
+          <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+            <p className="text-sm text-blue-700">
+              <strong>学习提示：</strong>点击下方推荐题目，跳转到洛谷、蓝桥杯等平台进行练习。建议按难度顺序逐步完成。
+            </p>
           </div>
         </Card>
       </motion.div>

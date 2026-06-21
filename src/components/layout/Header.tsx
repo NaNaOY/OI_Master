@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { BarChart3, BookOpen, ClipboardList, Home, Menu, Users, X } from 'lucide-react';
+import { BarChart3, BookOpen, ClipboardList, Home, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -15,7 +15,6 @@ const navItems: NavItem[] = [
   { id: 'diagnosis', label: '诊断中心', icon: <BarChart3 size={20} />, path: '/diagnosis' },
   { id: 'learning-path', label: '学习路径', icon: <BookOpen size={20} />, path: '/learning-path' },
   { id: 'daily', label: '每日推荐', icon: <ClipboardList size={20} />, path: '/daily' },
-  { id: 'parent', label: '家长报告', icon: <Users size={20} />, path: '/parent/report' },
 ];
 
 export const Header = () => {

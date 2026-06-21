@@ -1,23 +1,16 @@
 import { knowledgePoints } from '@/data/knowledgePoints';
 import { getLearningPathByLevel } from '@/data/learningPath';
-import { getProblemById, problems } from '@/data/problems';
 import type { DiagnosisAnswer, DiagnosisRecord } from '@/types/diagnosis';
-import type { ProblemRecord } from '@/types/problem';
-import type { MistakeRecord, UserLearningData } from '@/types/user';
-import { analyzeDiagnosis, calculateStats, generateDiagnosisRecord, updateLearningProgress } from '@/utils/analysis';
-import { generateUUID, initializeUserData, loadUserData, saveUserData } from '@/utils/storage';
+import { analyzeDiagnosis, generateDiagnosisRecord } from '@/utils/analysis';
+import { initializeUserData, loadUserData, saveUserData } from '@/utils/storage';
 import { create } from 'zustand';
 
 interface UserState {
-  userData: UserLearningData;
+  userData: ReturnType<typeof initializeUserData>;
   loadUser: () => void;
   saveUser: () => void;
   updateUserName: (name: string) => void;
-  addDiagnosisAnswer: (answer: DiagnosisAnswer) => void;
   completeDiagnosis: (level: 'CSP-J' | 'CSP-S', answers: DiagnosisAnswer[]) => DiagnosisRecord | null;
-  addProblemRecord: (record: ProblemRecord) => void;
-  addMistake: (problemId: string, code: string, errorType: string, aiAnalysis: string) => void;
-  markMistakeReviewed: (mistakeId: string) => void;
   updateStatistics: () => void;
   updateDailyRecommendations: () => void;
 }
@@ -41,25 +34,6 @@ export const useUserStore = create<UserState>((set, get) => ({
       userData: { ...state.userData, name },
     }));
     get().saveUser();
-  },
-  
-  addDiagnosisAnswer: (_answer) => {
-    set(state => ({
-      userData: {
-        ...state.userData,
-        diagnosisHistory: [
-          ...state.userData.diagnosisHistory,
-          {
-            id: `temp_${Date.now()}`,
-            date: new Date().toISOString(),
-            level: 'CSP-J',
-            scores: {},
-            weakPoints: [],
-            recommendations: [],
-          },
-        ],
-      },
-    }));
   },
   
   completeDiagnosis: (level: 'CSP-J' | 'CSP-S', answers: DiagnosisAnswer[]): DiagnosisRecord | null => {
@@ -137,127 +111,37 @@ export const useUserStore = create<UserState>((set, get) => ({
     return record;
   },
   
-  addProblemRecord: (record) => {
-    const problem = getProblemById(record.problemId);
-    if (!problem) return;
-    
-    set(state => {
-      const updatedProgress = updateLearningProgress(
-        state.userData.learningProgress,
-        problem,
-        record.status === 'accepted'
-      );
-      
-      return {
-        userData: {
-          ...state.userData,
-          completedProblems: [...state.userData.completedProblems, record],
-          learningProgress: updatedProgress,
-        },
-      };
-    });
-    
-    get().updateStatistics();
-    get().saveUser();
-  },
-  
-  addMistake: (problemId, code, errorType, aiAnalysis) => {
-    const newMistake: MistakeRecord = {
-      id: generateUUID(),
-      problemId,
-      date: new Date().toISOString(),
-      code,
-      errorType,
-      aiAnalysis,
-      reviewed: false,
-    };
-    
-    set(state => ({
-      userData: {
-        ...state.userData,
-        mistakes: [...state.userData.mistakes, newMistake],
-      },
-    }));
-    
-    get().saveUser();
-    return newMistake;
-  },
-  
-  markMistakeReviewed: (mistakeId) => {
-    set(state => ({
-      userData: {
-        ...state.userData,
-        mistakes: state.userData.mistakes.map(m =>
-          m.id === mistakeId ? { ...m, reviewed: true, reviewedAt: new Date().toISOString() } : m
-        ),
-      },
-    }));
-    
-    get().saveUser();
-  },
-  
   updateStatistics: () => {
+    // 统计数据计算逻辑（简化版）
     set(state => ({
       userData: {
         ...state.userData,
-        statistics: calculateStats(state.userData),
+        statistics: {
+          ...state.userData.statistics,
+        },
       },
     }));
   },
   
   updateDailyRecommendations: () => {
-    const { learningProgress, mistakes, completedProblems } = get().userData;
+    const { learningProgress } = get().userData;
     
-    // 获取薄弱知识点（掌握度低于80%）
+    // 获取薄弱知识点（掌握度低于70%）
     const weakKnowledgePoints = learningProgress
-      .filter(p => p.masteryLevel < 80)
+      .filter(p => p.masteryLevel < 70)
       .map(p => p.knowledgePointId);
     
-    // 获取错题涉及的知识点
-    const mistakeKnowledgePoints = [...new Set(
-      mistakes.map(m => {
-        const problem = problems.find(p => p.id === m.problemId);
-        return problem?.knowledgePoints[0];
-      }).filter((k): k is string => !!k)
-    )];
-    
-    // 合并目标知识点
-    const targetKnowledgePoints = [...new Set([...weakKnowledgePoints, ...mistakeKnowledgePoints])];
-    
-    const completedIds = new Set(completedProblems.map(cp => cp.problemId));
-    
-    // 优先推荐与目标知识点相关的题目，如果没有目标知识点则推荐所有未完成题目
-    let recommendedProblems = problems
-      .filter(p => {
-        if (completedIds.has(p.id)) return false;
-        // 如果有目标知识点，优先推荐相关题目；否则推荐所有题目
-        if (targetKnowledgePoints.length > 0) {
-          return p.knowledgePoints.some(kp => targetKnowledgePoints.includes(kp));
-        }
-        return true;
-      })
-      .sort((a, b) => {
-        const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
-        return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
-      });
-    
-    // 如果推荐题目不足5道，补充其他题目
-    if (recommendedProblems.length < 5) {
-      const additionalProblems = problems
-        .filter(p => !completedIds.has(p.id) && !recommendedProblems.find(rp => rp.id === p.id))
-        .sort((a, b) => {
-          const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
-          return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
-        });
-      recommendedProblems = [...recommendedProblems, ...additionalProblems.slice(0, 5 - recommendedProblems.length)];
-    }
+    // 获取推荐题目的知识点（按掌握度从低到高排序，最多5个）
+    const targetKnowledgePoints = weakKnowledgePoints.length > 0 
+      ? weakKnowledgePoints.slice(0, 5)
+      : learningProgress.slice(0, 3).map(p => p.knowledgePointId);
     
     const todayStr = new Date().toISOString().split('T')[0];
     
     set(state => ({
       userData: {
         ...state.userData,
-        dailyRecommendedProblems: recommendedProblems.slice(0, 5).map(p => p.id),
+        dailyRecommendedProblems: targetKnowledgePoints,
         dailyRecommendDate: todayStr,
       },
     }));

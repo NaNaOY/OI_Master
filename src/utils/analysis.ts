@@ -26,7 +26,7 @@ const getMasteryThreshold = (kpId: string): number => {
   if (isBasicKnowledgePoint(kpId)) {
     return 50; // 基础内容：50%即视为掌握
   }
-  return 60; // 进阶内容：60%视为掌握
+  return 70; // 进阶内容：70%视为掌握（根据用户反馈调整）
 };
 
 // 分析诊断答案，计算每个知识点的掌握度

@@ -57,10 +57,8 @@ export const DailyPractice = () => {
   };
   
   // 统计数据
-  const todayProblems = userData.completedProblems.filter(
-    p => new Date(p.completedAt).toDateString() === new Date().toDateString()
-  );
   const streakDays = userData.statistics.streakDays;
+  const diagnosisCount = userData.diagnosisHistory.length;
   
   return (
     <motion.div
@@ -110,8 +108,8 @@ export const DailyPractice = () => {
                 <Target size={24} className="text-emerald-600" />
               </motion.div>
               <div>
-                <span className="text-xs text-neutral-500">今日练习</span>
-                <span className="block text-2xl font-bold text-emerald-600">{todayProblems.length}</span>
+                <span className="text-xs text-neutral-500">诊断次数</span>
+                <span className="block text-2xl font-bold text-emerald-600">{diagnosisCount}</span>
               </div>
             </div>
             
@@ -167,7 +165,6 @@ export const DailyPractice = () => {
                   onClick={() => navigate(`/learning-path/kp/${p.knowledgePointId}`)}
                 >
                   {getKnowledgePointName(p.knowledgePointId)}
-                  <span className="ml-2 text-xs text-amber-500">({p.masteryLevel}%)</span>
                 </motion.div>
               ))}
             </div>

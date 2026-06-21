@@ -6,7 +6,6 @@ import { DiagnosisTest } from '@/pages/Diagnosis/TestPage';
 import { Home } from '@/pages/Home';
 import { LearningPath } from '@/pages/LearningPath';
 import { KnowledgeDetail } from '@/pages/LearningPath/KnowledgeDetail';
-import { ParentReport } from '@/pages/ParentReport';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
@@ -37,7 +36,6 @@ export const AppRoutes = () => {
           <Route path="/learning-path/level/:level" element={<AnimatedPage><LearningPath /></AnimatedPage>} />
           <Route path="/learning-path/kp/:nodeId" element={<AnimatedPage><KnowledgeDetail /></AnimatedPage>} />
           <Route path="/daily" element={<AnimatedPage><DailyPractice /></AnimatedPage>} />
-          <Route path="/parent/report" element={<AnimatedPage><ParentReport /></AnimatedPage>} />
         </Routes>
       </AnimatePresence>
     </Layout>

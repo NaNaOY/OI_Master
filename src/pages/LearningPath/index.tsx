@@ -1,11 +1,9 @@
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
-import { ProgressBar } from '@/components/common/ProgressBar';
 import { getKnowledgePointById } from '@/data/knowledgePoints';
 import { getLearningPathByLevel } from '@/data/learningPath';
-import { getProblemsByKnowledgePoint } from '@/data/problems';
 import { useUserStore } from '@/store/useUserStore';
-import { getKnowledgePointName, getMasteryColor, getMasteryLevel } from '@/utils/analysis';
+import { getKnowledgePointName } from '@/utils/analysis';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, BookOpen, CheckCircle, Lock, Sparkles, Star, Target, Zap } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
@@ -245,13 +243,9 @@ export const LearningPath = () => {
       >
         {learningPath.nodes.map((node, index) => {
           const kp = getKnowledgePointById(node.knowledgePointId);
-          const progress = getProgress(node.knowledgePointId);
           const unlocked = isUnlocked(index, node.prerequisites);
-          const mastery = progress?.masteryLevel || 0;
-          const completed = progress?.completedProblems || 0;
-          const totalProblems = getProblemsByKnowledgePoint(node.knowledgePointId).length;
           const diff = difficultyConfig[kp?.difficulty as keyof typeof difficultyConfig] || difficultyConfig[1];
-          const isCompleted = mastery >= 90;
+          const isCompleted = false; // 不再追踪完成状态
           
           return (
             <motion.div
@@ -345,74 +339,17 @@ export const LearningPath = () => {
                     </motion.p>
                     
                     {unlocked ? (
-                      <motion.div 
-                        className="space-y-3"
+                      <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-primary-500 to-indigo-500 flex items-center justify-center">
-                              <Star size={10} className="text-white" />
-                            </div>
-                            <span className="text-sm text-neutral-600 font-medium">掌握度</span>
-                          </div>
-                          <motion.span 
-                            className="font-bold text-lg"
-                            style={{ color: getMasteryColor(mastery) }}
-                            whileHover={{ scale: 1.1 }}
-                          >
-                            {mastery}%
-                          </motion.span>
-                        </div>
-                        <ProgressBar
-                          value={mastery}
-                          color={getMasteryColor(mastery)}
-                          height={6}
-                          className="rounded-full"
-                        />
-                        
-                        <div className="h-px bg-neutral-100" />
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                              <Target size={10} className="text-white" />
-                            </div>
-                            <span className="text-sm text-neutral-600 font-medium">学习进度</span>
-                          </div>
-                          <motion.span 
-                            className="font-bold text-amber-600"
-                            whileHover={{ scale: 1.1 }}
-                          >
-                            {completed}/{totalProblems} 题
-                          </motion.span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-3 bg-neutral-100 rounded-full overflow-hidden">
-                            <motion.div
-                              className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${totalProblems > 0 ? (completed / totalProblems) * 100 : 0}%` }}
-                              transition={{ duration: 0.8 }}
-                            />
-                          </div>
-                          <span className="text-xs text-neutral-500 w-12 text-right">
-                            {totalProblems > 0 ? Math.round((completed / totalProblems) * 100) : 0}%
-                          </span>
-                        </div>
-                        
                         <div className="flex items-center justify-end">
-                          <motion.span 
-                            className="text-xs px-3 py-1 rounded-full font-medium"
-                            style={{
-                              backgroundColor: `${getMasteryColor(mastery)}20`,
-                              color: getMasteryColor(mastery),
-                            }}
+                          <motion.span
+                            className="text-xs px-3 py-1 rounded-full font-medium bg-primary-50 text-primary-600"
                             whileHover={{ scale: 1.1 }}
                           >
-                            {getMasteryLevel(mastery)}
+                            点击学习
                           </motion.span>
                         </div>
                       </motion.div>
