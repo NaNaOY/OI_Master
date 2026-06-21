@@ -10,8 +10,7 @@ export const RadarChart = ({ data, title }: RadarChartProps) => {
     title: title ? { text: title, left: 'center' } : undefined,
     tooltip: {},
     legend: {
-      data: ['掌握度'],
-      bottom: 10,
+      show: false,
     },
     radar: {
       indicator: data.map(item => ({ name: item.name, max: 100 })),

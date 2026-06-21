@@ -79,7 +79,7 @@ export const DailyPractice = () => {
   
   if (todayData.date === todayStr && todayData.problemIds.length > 0) {
     // 今天已有推荐，直接使用（固定不变）
-    recommendedProblems = allRecommendedProblems.filter(p => todayData.problemIds.includes(p.id));
+    recommendedProblems = allRecommendedProblems.filter(p => todayData.problemIds.includes(p.id)).slice(0, 3);
   } else if (latestDiagnosis) {
     // 今天没有推荐，生成新的固定3道题目
     // 过滤掉已完成的题目
