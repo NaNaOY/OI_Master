@@ -73,12 +73,13 @@ export const DiagnosisReport = () => {
     );
   }
   
+  // 雷达图显示所有诊断涉及的知识点（包括0分的），按知识点ID排序保证顺序一致
   const radarData = Object.entries(diagnosis.scores)
     .map(([kpId, score]) => ({
       name: getKnowledgePointName(kpId),
       value: score,
     }))
-    .filter(item => item.value > 0);
+    .sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
   
   const sortedKP = Object.entries(diagnosis.scores)
     .map(([kpId, score]) => ({
@@ -236,20 +237,25 @@ export const DiagnosisReport = () => {
             <h3 className="font-bold text-neutral-800 mb-4 flex items-center gap-3">
               <AlertTriangle size={20} className="text-red-500" />
               薄弱知识点
+              {weakPoints.length > 0 && (
+                <span className="text-xs text-neutral-400 font-normal ml-auto">
+                  共 {weakPoints.length} 个
+                </span>
+              )}
             </h3>
-            
+
             {weakPoints.length > 0 ? (
-              <div className="flex-1 space-y-3">
-                {weakPoints.slice(0, 5).map((item, index) => (
+              <div className="flex-1 space-y-3 overflow-y-auto max-h-[360px] pr-1">
+                {weakPoints.map((item, index) => (
                   <motion.div
                     key={item.kpId}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: Math.min(index * 0.05, 0.5) }}
                     whileHover={{ x: 5 }}
                     className="flex items-center gap-3 p-3 rounded-xl bg-red-50/50 border border-red-100"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center text-white text-xs font-bold">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                       {index + 1}
                     </div>
                     <div className="flex-1 min-w-0">

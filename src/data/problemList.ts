@@ -1,6 +1,8 @@
 // NOI题单数据
 // 来源：题单.xlsx
 
+import { knowledgePoints } from './knowledgePoints';
+
 export interface ProblemItem {
   id: string;
   category: string; // 知识点分类（与诊断知识点对应）
@@ -239,25 +241,51 @@ export const problemList: ProblemItem[] = [
 export const getRecommendedProblemsByKnowledgePoint = (kpId: string): ProblemItem[] => {
   const categories = knowledgeToCategory[kpId] || [];
   if (categories.length === 0) return [];
-  
-  const problems = problemList.filter(p => categories.includes(p.category));
-  
-  // 按难度排序：简单在前
-  return problems.sort((a, b) => {
-    const order = { easy: 0, medium: 1, hard: 2 };
-    return order[a.difficulty] - order[b.difficulty];
-  }).slice(0, 10);
+
+  // 获取知识点难度
+  const kp = knowledgePoints.find(k => k.id === kpId);
+  const kpDifficulty = kp?.difficulty || 3;
+
+  // 从匹配分类中筛选题目
+  const matched = problemList.filter(p => categories.includes(p.category));
+
+  if (matched.length === 0) return [];
+
+  // 按知识点难度优先级排序，同时混入各难度题目保证多样性
+  const easy = matched.filter(p => p.difficulty === 'easy');
+  const medium = matched.filter(p => p.difficulty === 'medium');
+  const hard = matched.filter(p => p.difficulty === 'hard');
+
+  // 根据知识点难度确定各难度题目的比例
+  let result: ProblemItem[] = [];
+  if (kpDifficulty <= 2) {
+    result = [...easy.slice(0, 6), ...medium.slice(0, 3), ...hard.slice(0, 1)];
+  } else if (kpDifficulty <= 4) {
+    result = [...medium.slice(0, 5), ...easy.slice(0, 3), ...hard.slice(0, 2)];
+  } else if (kpDifficulty <= 6) {
+    result = [...medium.slice(0, 4), ...hard.slice(0, 4), ...easy.slice(0, 2)];
+  } else {
+    result = [...hard.slice(0, 5), ...medium.slice(0, 4), ...easy.slice(0, 1)];
+  }
+
+  return result.slice(0, 10);
 };
 
 // 根据薄弱知识点列表获取推荐的题目
 export const getRecommendedProblemsByWeakPoints = (weakPoints: string[]): ProblemItem[] => {
   if (weakPoints.length === 0) return [];
-  
+
   const allProblems: ProblemItem[] = [];
   const addedIds = new Set<string>();
-  
-  // 对每个薄弱知识点获取推荐题目
-  weakPoints.forEach(kpId => {
+
+  // 对每个薄弱知识点获取推荐题目（优先难度高的知识点）
+  const sortedWeakPoints = [...weakPoints].sort((a, b) => {
+    const kpA = knowledgePoints.find(k => k.id === a);
+    const kpB = knowledgePoints.find(k => k.id === b);
+    return (kpB?.difficulty || 0) - (kpA?.difficulty || 0);
+  });
+
+  sortedWeakPoints.forEach(kpId => {
     const problems = getRecommendedProblemsByKnowledgePoint(kpId);
     problems.forEach(p => {
       if (!addedIds.has(p.id)) {
@@ -266,10 +294,10 @@ export const getRecommendedProblemsByWeakPoints = (weakPoints: string[]): Proble
       }
     });
   });
-  
-  // 按难度排序：简单在前
+
+  // 最终按知识点难度加权排序：高难度的题目排在前面
   return allProblems.sort((a, b) => {
-    const order = { easy: 0, medium: 1, hard: 2 };
+    const order = { hard: 0, medium: 1, easy: 2 };
     return order[a.difficulty] - order[b.difficulty];
   }).slice(0, 20);
 };
