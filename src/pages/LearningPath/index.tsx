@@ -1,11 +1,10 @@
-import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { getKnowledgePointById } from '@/data/knowledgePoints';
 import { getLearningPathByLevel } from '@/data/learningPath';
 import { useUserStore } from '@/store/useUserStore';
 import { getKnowledgePointName } from '@/utils/analysis';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, BookOpen, CheckCircle, Lock, Sparkles, Star, Target, Zap } from 'lucide-react';
+import { BookOpen, CheckCircle, Lock, Sparkles, Star, Target, Zap } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 
 const containerVariants = {
@@ -338,22 +337,7 @@ export const LearningPath = () => {
                       {kp?.description}
                     </motion.p>
                     
-                    {unlocked ? (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                      >
-                        <div className="flex items-center justify-end">
-                          <motion.span
-                            className="text-xs px-3 py-1 rounded-full font-medium bg-primary-50 text-primary-600"
-                            whileHover={{ scale: 1.1 }}
-                          >
-                            点击学习
-                          </motion.span>
-                        </div>
-                      </motion.div>
-                    ) : (
+                    {!unlocked && (
                       <motion.div 
                         className="flex items-center gap-3 text-sm text-neutral-400 bg-neutral-50 p-3 rounded-xl"
                         initial={{ opacity: 0 }}
@@ -370,31 +354,6 @@ export const LearningPath = () => {
                     )}
                   </div>
                   
-                  {unlocked && (
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                      <Link to={`/learning-path/kp/${node.knowledgePointId}`}>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="shrink-0 px-4 py-2 rounded-xl font-medium"
-                        >
-                          {isCompleted ? (
-                            <motion.div
-                              animate={{ x: [0, 3, 0] }}
-                              transition={{ duration: 1.5, repeat: Infinity }}
-                            >
-                              <ArrowRight size={18} />
-                            </motion.div>
-                          ) : (
-                            <>
-                              <BookOpen size={16} className="mr-1" />
-                              学习
-                            </>
-                          )}
-                        </Button>
-                      </Link>
-                    </motion.div>
-                  )}
                 </div>
               </Card>
             </motion.div>

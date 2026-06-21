@@ -1,6 +1,7 @@
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { useUserStore } from '@/store/useUserStore';
+import { getKnowledgePointName } from '@/utils/analysis';
 import { motion } from 'framer-motion';
 import { Award, BarChart3, BookOpen, ChevronRight, ClipboardList, Clock, Sparkles, Target, TrendingUp, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -384,7 +385,7 @@ export const Home = () => {
                               key={index}
                               className="px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-medium"
                             >
-                              {kp}
+                              {getKnowledgePointName(kp)}
                             </span>
                           ))}
                         </div>
