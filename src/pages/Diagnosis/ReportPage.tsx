@@ -7,7 +7,7 @@ import { getRecommendedProblemsByWeakPoints } from '@/data/problemList';
 import { useUserStore } from '@/store/useUserStore';
 import { getKnowledgePointName, getMasteryColor } from '@/utils/analysis';
 import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Award, BookOpen, CheckCircle, ExternalLink, Sparkles, Star, Target, TrendingUp, Zap } from 'lucide-react';
+import { AlertTriangle, Award, BookOpen, CheckCircle, ExternalLink, Sparkles, Star, Target, TrendingUp, Zap } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const containerVariants = {
@@ -117,16 +117,45 @@ export const DiagnosisReport = () => {
     }
   };
   
-  const getActionPlan = (_kpId: string, score: number) => {
-    const basePlan = [
-      { type: 'video', icon: 'BookOpen', label: '观看教学视频', time: '15分钟' },
-      { type: 'practice', icon: 'Target', label: '完成专项练习', time: '30分钟' },
-      { type: 'review', icon: 'Zap', label: '代码实践', time: '20分钟' },
-    ];
-    if (score < 40) {
-      return [...basePlan, { type: 'mistake', icon: 'AlertTriangle', label: '回顾错题', time: '15分钟' }];
+  const getActionPlan = (kpId: string, score: number) => {
+    const kp = knowledgePoints.find(k => k.id === kpId);
+    const kpDifficulty = kp?.difficulty || 3;
+    
+    // 根据知识点难度和得分情况生成个性化学习计划
+    const plan = [];
+    
+    // 基础学习
+    if (score < 30) {
+      plan.push({ type: 'learn', icon: 'BookOpen', label: '学习基础概念与原理', time: '20分钟' });
+    } else if (score < 50) {
+      plan.push({ type: 'review', icon: 'BookOpen', label: '复习核心知识点', time: '15分钟' });
+    } else {
+      plan.push({ type: 'practice', icon: 'Target', label: '巩固基础知识', time: '10分钟' });
     }
-    return basePlan;
+    
+    // 练习环节 - 根据难度调整
+    if (kpDifficulty <= 3) {
+      plan.push({ type: 'practice', icon: 'Target', label: '完成基础练习题', time: '25分钟' });
+    } else if (kpDifficulty <= 5) {
+      plan.push({ type: 'practice', icon: 'Target', label: '完成进阶练习题', time: '30分钟' });
+    } else {
+      plan.push({ type: 'practice', icon: 'Target', label: '完成提高练习题', time: '35分钟' });
+    }
+    
+    // 代码实践
+    plan.push({ type: 'code', icon: 'Zap', label: '动手编写代码', time: '20分钟' });
+    
+    // 错题回顾（低分时）
+    if (score < 40) {
+      plan.push({ type: 'mistake', icon: 'AlertTriangle', label: '分析错题原因', time: '15分钟' });
+    }
+    
+    // 拓展学习（高分时）
+    if (score >= 50 && kpDifficulty >= 5) {
+      plan.push({ type: 'extend', icon: 'Star', label: '尝试相关拓展题目', time: '20分钟' });
+    }
+    
+    return plan;
   };
   
   const renderIcon = (iconName: string) => {
@@ -286,10 +315,13 @@ export const DiagnosisReport = () => {
             <h3 className="font-bold text-neutral-800 mb-6 flex items-center gap-3">
               <Sparkles size={20} className="text-violet-500" />
               针对性学习计划
+              <span className="text-xs text-neutral-400 font-normal ml-auto">
+                共 {weakPoints.length} 个薄弱知识点
+              </span>
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {weakPoints.slice(0, 2).map((item) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[500px] overflow-y-auto pr-2">
+              {weakPoints.map((item, index) => (
                 <motion.div
                   key={item.kpId}
                   whileHover={{ y: -3 }}
@@ -298,29 +330,33 @@ export const DiagnosisReport = () => {
                   <div className="p-4 bg-gradient-to-r from-violet-50 to-purple-50/50 border-b border-violet-100">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white">
-                          <Target size={20} />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                          {index + 1}
                         </div>
                         <div>
                           <h4 className="font-semibold text-neutral-800">{item.kp?.name}</h4>
-                          <span className="text-xs text-neutral-500">当前掌握度 {item.score}%</span>
+                          <span className="text-xs text-neutral-500">得分 {item.score}%</span>
                         </div>
                       </div>
-                      <span className="text-xs px-3 py-1 rounded-full font-medium bg-red-100 text-red-600">
-                        优先级高
+                      <span className={`text-xs px-3 py-1 rounded-full font-medium ${
+                        item.score < 30 ? 'bg-red-100 text-red-600' :
+                        item.score < 50 ? 'bg-amber-100 text-amber-600' :
+                        'bg-violet-100 text-violet-600'
+                      }`}>
+                        {item.score < 30 ? '急需加强' : item.score < 50 ? '重点学习' : '适度练习'}
                       </span>
                     </div>
                   </div>
                   
-                  <div className="p-4 space-y-3">
-                    {getActionPlan(item.kpId, item.score).map((action, idx) => (
+                  <div className="p-4 space-y-2">
+                    {getActionPlan(item.kpId, item.score).slice(0, 3).map((action, idx) => (
                       <div key={action.type} className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs font-bold">
+                        <div className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs font-bold">
                           {idx + 1}
                         </div>
                         <div className="flex-1 flex items-center gap-2">
                           {renderIcon(action.icon)}
-                          <span className="text-sm text-neutral-700">{action.label}</span>
+                          <span className="text-sm text-neutral-700 truncate">{action.label}</span>
                         </div>
                         <span className="text-xs text-neutral-400">{action.time}</span>
                       </div>
@@ -331,10 +367,10 @@ export const DiagnosisReport = () => {
                     <motion.button 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full py-2.5 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-medium hover:from-violet-600 hover:to-purple-600 transition-all"
+                      className="w-full py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-medium hover:from-violet-600 hover:to-purple-600 transition-all"
                       onClick={() => navigate(`/learning-path/kp/${item.kpId}`)}
                     >
-                      开始学习 →
+                      查看题单 →
                     </motion.button>
                   </div>
                 </motion.div>
@@ -474,17 +510,6 @@ export const DiagnosisReport = () => {
             </motion.div>
           )}
         </Card>
-      </motion.div>
-      
-      <motion.div variants={itemVariants} className="flex justify-center pt-4">
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Link to="/daily">
-            <Button size="lg" className="bg-gradient-to-r from-primary-500 to-indigo-500 hover:from-primary-600 hover:to-indigo-600 shadow-xl px-10 py-4 rounded-xl font-semibold">
-              根据诊断结果规划练习题目
-              <ArrowRight size={20} className="ml-3" />
-            </Button>
-          </Link>
-        </motion.div>
       </motion.div>
     </motion.div>
   );

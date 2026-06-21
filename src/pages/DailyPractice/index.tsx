@@ -32,34 +32,24 @@ export const DailyPractice = () => {
     ? userData.diagnosisHistory[userData.diagnosisHistory.length - 1]
     : null;
   
-  const weakPoints = latestDiagnosis 
-    ? latestDiagnosis.weakPoints.map(kpId => ({ knowledgePointId: kpId }))
-    : [];
-  
-  const allRecommendedProblems = latestDiagnosis
-    ? getRecommendedProblemsByWeakPoints(latestDiagnosis.weakPoints)
-    : [];
-  
   // 获取今天的日期
   const todayStr = new Date().toISOString().split('T')[0];
   
-  // 从 localStorage 读取今日已推荐的题目
-  const getTodayRecommended = (): string[] => {
+  // 从 localStorage 读取今日固定的推荐题目
+  const getTodayRecommended = (): { date: string; problemIds: string[] } => {
     try {
       const stored = localStorage.getItem('dailyRecommended');
       if (stored) {
         const data = JSON.parse(stored);
-        if (data.date === todayStr) {
-          return data.problemIds;
-        }
+        return data;
       }
     } catch (e) {
       // ignore
     }
-    return [];
+    return { date: '', problemIds: [] };
   };
   
-  // 保存今日推荐
+  // 保存今日推荐（固定3道）
   const saveTodayRecommended = (problemIds: string[]) => {
     try {
       localStorage.setItem('dailyRecommended', JSON.stringify({
@@ -71,29 +61,35 @@ export const DailyPractice = () => {
     }
   };
   
+  const todayData = getTodayRecommended();
   const completedProblemIds = userData.completedProblems.map(p => p.problemId);
-  const todayRecommended = getTodayRecommended();
   
-  // 过滤掉已完成和今日已推荐的题目
-  const availableProblems = allRecommendedProblems.filter(p => 
-    !completedProblemIds.includes(p.id) && !todayRecommended.includes(p.id)
-  );
+  // 获取薄弱知识点列表
+  const weakPointsList = latestDiagnosis 
+    ? latestDiagnosis.weakPoints.map(kpId => ({ knowledgePointId: kpId }))
+    : [];
   
-  // 如果可用题目不足3道，补充更多
-  let recommendedProblems = availableProblems.slice(0, 3);
+  // 获取所有推荐题目
+  const allRecommendedProblems = latestDiagnosis
+    ? getRecommendedProblemsByWeakPoints(latestDiagnosis.weakPoints)
+    : [];
   
-  // 如果可用题目不足3道，补充今日推荐的题目（但还未完成的）
-  if (recommendedProblems.length < 3) {
-    const todayNotDone = allRecommendedProblems.filter(p => 
-      !completedProblemIds.includes(p.id) && todayRecommended.includes(p.id)
-    );
-    recommendedProblems = [...recommendedProblems, ...todayNotDone].slice(0, 3);
-  }
+  // 判断是否需要生成新的今日推荐
+  let recommendedProblems: typeof allRecommendedProblems = [];
   
-  // 保存今日推荐
-  const newTodayRecommended = Array.from(new Set([...todayRecommended, ...recommendedProblems.map(p => p.id)]));
-  if (newTodayRecommended.length > todayRecommended.length) {
-    saveTodayRecommended(newTodayRecommended);
+  if (todayData.date === todayStr && todayData.problemIds.length > 0) {
+    // 今天已有推荐，直接使用（固定不变）
+    recommendedProblems = allRecommendedProblems.filter(p => todayData.problemIds.includes(p.id));
+  } else if (latestDiagnosis) {
+    // 今天没有推荐，生成新的固定3道题目
+    // 过滤掉已完成的题目
+    const undoneProblems = allRecommendedProblems.filter(p => !completedProblemIds.includes(p.id));
+    recommendedProblems = undoneProblems.slice(0, 3);
+    
+    // 保存到 localStorage
+    if (recommendedProblems.length > 0) {
+      saveTodayRecommended(recommendedProblems.map(p => p.id));
+    }
   }
   
   const handleMarkDone = (problemId: string) => {
@@ -196,7 +192,7 @@ export const DailyPractice = () => {
               </motion.div>
               <div>
                 <span className="text-xs text-neutral-500">薄弱知识点</span>
-                <span className="block text-2xl font-bold text-violet-600">{weakPoints.length}</span>
+                <span className="block text-2xl font-bold text-violet-600">{weakPointsList.length}</span>
               </div>
             </div>
           </div>
@@ -204,7 +200,7 @@ export const DailyPractice = () => {
       </motion.div>
       
       {/* 薄弱知识点提示 */}
-      {weakPoints.length > 0 && (
+      {weakPointsList.length > 0 && (
         <motion.div variants={itemVariants}>
           <Card className="p-6 border border-amber-100/50 shadow-lg rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50">
             <div className="flex items-center gap-3 mb-4">
@@ -215,7 +211,7 @@ export const DailyPractice = () => {
             </div>
             
             <div className="flex flex-wrap gap-2">
-              {weakPoints.map((p, index) => (
+              {weakPointsList.map((p, index) => (
                 <motion.div
                   key={p.knowledgePointId}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -246,60 +242,84 @@ export const DailyPractice = () => {
           
           {recommendedProblems.length > 0 ? (
             <div className="space-y-3">
-              {recommendedProblems.map((problem, index) => (
-                <motion.div
-                  key={problem.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileHover={{ x: 5 }}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-neutral-50 to-neutral-100/30 border border-neutral-100 hover:border-primary-200 transition-all group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-indigo-100 flex items-center justify-center text-primary-600 font-bold text-sm">
-                    {index + 1}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-neutral-800">{problem.title}</span>
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-600">
-                        {problem.category}
-                      </span>
+              {recommendedProblems.map((problem, index) => {
+                const isCompleted = completedProblemIds.includes(problem.id);
+                return (
+                  <motion.div
+                    key={problem.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{ x: 5 }}
+                    className={`flex items-center gap-4 p-4 rounded-xl border transition-all group ${
+                      isCompleted 
+                        ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200' 
+                        : 'bg-gradient-to-r from-neutral-50 to-neutral-100/30 border-neutral-100 hover:border-primary-200'
+                    }`}
+                  >
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
+                      isCompleted 
+                        ? 'bg-gradient-to-br from-emerald-100 to-green-100 text-emerald-600' 
+                        : 'bg-gradient-to-br from-primary-100 to-indigo-100 text-primary-600'
+                    }`}>
+                      {isCompleted ? <Check size={18} /> : index + 1}
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-neutral-500">
-                      <span className="px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">{problem.platform}</span>
-                      <span className="text-neutral-400">{problem.problemId}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <motion.button
-                      onClick={() => handleMarkDone(problem.id)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg border border-emerald-300 text-emerald-600 text-sm font-medium hover:bg-emerald-50 transition-all"
-                      title="标记为已做"
-                    >
-                      <Check size={14} />
-                      已做
-                    </motion.button>
                     
-                    <motion.a
-                      href={getProblemLink(problem.platform, problem.problemId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-indigo-500 text-white text-sm font-medium hover:from-primary-600 hover:to-indigo-600 transition-all shadow-md"
-                    >
-                      <ExternalLink size={14} />
-                      去做题
-                    </motion.a>
-                  </div>
-                </motion.div>
-              ))}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`font-medium ${isCompleted ? 'text-emerald-700' : 'text-neutral-800'}`}>{problem.title}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          isCompleted ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-100 text-blue-600'
+                        }`}>
+                          {problem.category}
+                        </span>
+                        {isCompleted && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-200 text-emerald-700">
+                            已完成
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-neutral-500">
+                        <span className="px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">{problem.platform}</span>
+                        <span className="text-neutral-400">{problem.problemId}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      {!isCompleted && (
+                        <motion.button
+                          onClick={() => handleMarkDone(problem.id)}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-emerald-300 text-emerald-600 text-sm font-medium hover:bg-emerald-50 transition-all"
+                          title="标记为已做"
+                        >
+                          <Check size={14} />
+                          已做
+                        </motion.button>
+                      )}
+                      
+                      <motion.a
+                        href={getProblemLink(problem.platform, problem.problemId)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-md ${
+                          isCompleted 
+                            ? 'bg-neutral-200 text-neutral-600 hover:bg-neutral-300' 
+                            : 'bg-gradient-to-r from-primary-500 to-indigo-500 text-white hover:from-primary-600 hover:to-indigo-600'
+                        }`}
+                      >
+                        <ExternalLink size={14} />
+                        {isCompleted ? '再练一次' : '去做题'}
+                      </motion.a>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
-          ) : availableProblems.length === 0 && latestDiagnosis ? (
+          ) : latestDiagnosis ? (
             <div className="text-center py-12">
               <motion.div 
                 className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center mx-auto mb-4"
@@ -309,7 +329,7 @@ export const DailyPractice = () => {
                 <Check size={24} className="text-emerald-500" />
               </motion.div>
               <p className="text-emerald-600 font-medium mb-2">今日推荐题目已全部完成</p>
-              <p className="text-sm text-neutral-400">太棒了！诊断报告中的所有题目都已完成</p>
+              <p className="text-sm text-neutral-400">太棒了！明天将为你推荐新的题目</p>
               
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="mt-6">
                 <Link to="/diagnosis">

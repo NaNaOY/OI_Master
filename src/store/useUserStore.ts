@@ -14,6 +14,7 @@ interface UserState {
   updateStatistics: () => void;
   updateDailyRecommendations: () => void;
   markProblemCompleted: (problemId: string) => void;
+  clearCompletedProblem: (problemId: string) => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -172,6 +173,17 @@ export const useUserStore = create<UserState>((set, get) => ({
             memoryUsage: 0,
           },
         ],
+      },
+    }));
+    
+    get().saveUser();
+  },
+  
+  clearCompletedProblem: (problemId: string) => {
+    set(state => ({
+      userData: {
+        ...state.userData,
+        completedProblems: state.userData.completedProblems.filter(p => p.problemId !== problemId),
       },
     }));
     
