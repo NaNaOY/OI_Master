@@ -1,6 +1,5 @@
 import { Layout } from '@/components/layout/Layout';
 import { DailyPractice } from '@/pages/DailyPractice';
-import { ProblemPage } from '@/pages/DailyPractice/ProblemPage';
 import { Diagnosis } from '@/pages/Diagnosis';
 import { DiagnosisReport } from '@/pages/Diagnosis/ReportPage';
 import { DiagnosisTest } from '@/pages/Diagnosis/TestPage';
@@ -40,7 +39,6 @@ export const AppRoutes = () => {
           <Route path="/learning-path/level/:level" element={<AnimatedPage><LearningPath /></AnimatedPage>} />
           <Route path="/learning-path/kp/:nodeId" element={<AnimatedPage><KnowledgeDetail /></AnimatedPage>} />
           <Route path="/daily" element={<AnimatedPage><DailyPractice /></AnimatedPage>} />
-          <Route path="/daily/problem/:id" element={<AnimatedPage><ProblemPage /></AnimatedPage>} />
           <Route path="/mistakes" element={<AnimatedPage><Mistakes /></AnimatedPage>} />
           <Route path="/mistakes/:id" element={<AnimatedPage><MistakeAnalysis /></AnimatedPage>} />
           <Route path="/parent/report" element={<AnimatedPage><ParentReport /></AnimatedPage>} />

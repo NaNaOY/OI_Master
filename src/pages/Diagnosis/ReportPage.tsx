@@ -1,12 +1,13 @@
-import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Award, BookOpen, CheckCircle, Sparkles, Star, Target, TrendingUp, Zap } from 'lucide-react';
-import { Card } from '@/components/common/Card';
-import { Button } from '@/components/common/Button';
 import { RadarChart } from '@/components/charts/RadarChart';
+import { Button } from '@/components/common/Button';
+import { Card } from '@/components/common/Card';
 import { ProgressBar } from '@/components/common/ProgressBar';
+import { knowledgePoints } from '@/data/knowledgePoints';
+import { getRecommendedProblemsByWeakPoints } from '@/data/problemList';
 import { useUserStore } from '@/store/useUserStore';
 import { getKnowledgePointName, getMasteryColor } from '@/utils/analysis';
-import { knowledgePoints } from '@/data/knowledgePoints';
+import { motion } from 'framer-motion';
+import { AlertTriangle, ArrowRight, Award, BookOpen, CheckCircle, ExternalLink, Sparkles, Star, Target, TrendingUp, Zap } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const containerVariants = {
@@ -94,6 +95,26 @@ export const DiagnosisReport = () => {
   
   const avgScore = Math.round(Object.values(diagnosis.scores).reduce((a, b) => a + b, 0) / Object.keys(diagnosis.scores).length);
   const grade = getGrade(avgScore);
+  
+  // 获取推荐的题目
+  const recommendedProblems = getRecommendedProblemsByWeakPoints(weakPoints.map(p => p.kpId));
+  
+  // 根据平台获取题目链接
+  const getProblemLink = (platform: string, problemId: string): string => {
+    switch (platform) {
+      case '洛谷':
+        return `https://www.luogu.com.cn/problem/${problemId}`;
+      case '蓝桥杯':
+        return `https://www.lanqiao.cn/problems/${problemId}/learning/`;
+      case 'LeetCode':
+        return `https://leetcode.cn/problems/${problemId}/`;
+      case '杭电OJ':
+      case '杭电 OJ':
+        return `http://acm.hdu.edu.cn/showproblem.php?pid=${problemId}`;
+      default:
+        return '#';
+    }
+  };
   
   const getActionPlan = (_kpId: string, score: number) => {
     const basePlan = [
@@ -342,6 +363,63 @@ export const DiagnosisReport = () => {
           </div>
         </Card>
       </motion.div>
+      
+      {/* 推荐题目列表 */}
+      {recommendedProblems.length > 0 && (
+        <motion.div variants={itemVariants}>
+          <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">
+            <div className="flex items-center gap-3 mb-6">
+              <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}>
+                <Sparkles size={20} className="text-violet-500" />
+              </motion.div>
+              <h3 className="font-bold text-neutral-800">推荐练习题目</h3>
+              <span className="text-sm text-neutral-500">基于薄弱知识点匹配的题单</span>
+            </div>
+            
+            <div className="space-y-3">
+              {recommendedProblems.slice(0, 10).map((problem: { id: string; title: string; category: string; platform: string; problemId: string }, index: number) => (
+                <motion.div
+                  key={problem.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ x: 5 }}
+                  className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-neutral-50 to-neutral-100/30 border border-neutral-100 hover:border-primary-200 transition-all group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-indigo-100 flex items-center justify-center text-primary-600 font-bold text-sm">
+                    {index + 1}
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-neutral-800">{problem.title}</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-600">
+                        {problem.category}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-neutral-500">
+                      <span className="px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">{problem.platform}</span>
+                      <span className="text-neutral-400">{problem.problemId}</span>
+                    </div>
+                  </div>
+                  
+                  <motion.a
+                    href={getProblemLink(problem.platform, problem.problemId)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-indigo-500 text-white text-sm font-medium hover:from-primary-600 hover:to-indigo-600 transition-all shadow-md"
+                  >
+                    <ExternalLink size={14} />
+                    去做题
+                  </motion.a>
+                </motion.div>
+              ))}
+            </div>
+          </Card>
+        </motion.div>
+      )}
       
       <motion.div variants={itemVariants}>
         <Card className="p-6 border border-neutral-100/50 shadow-lg rounded-2xl">

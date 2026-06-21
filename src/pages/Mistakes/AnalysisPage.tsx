@@ -447,11 +447,11 @@ export const MistakeAnalysis = () => {
         {problem && (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button 
-              onClick={() => navigate(`/daily/problem/${problem.id}`)}
+              onClick={() => navigate(`/learning-path/kp/${problem.knowledgePoints[0]}`)}
               className="bg-gradient-to-r from-primary-500 to-indigo-500 hover:from-primary-600 hover:to-indigo-600 shadow-lg px-8 py-3 rounded-xl font-semibold"
             >
               <Sparkles size={18} className="mr-2" />
-              重新练习
+              查看知识点
             </Button>
           </motion.div>
         )}
