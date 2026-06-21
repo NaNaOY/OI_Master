@@ -99,38 +99,94 @@ export const ProblemPage = () => {
       setAttempts(prev => prev + 1);
 
       const trimmedCode = code.trim();
-      const codeLines = trimmedCode.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      const bodyLines = codeLines.filter(l => !l.startsWith('#') && !l.startsWith('//') && !l.startsWith('using'));
-      const mainBody = bodyLines.slice(bodyLines.indexOf('int main() {') + 1, bodyLines.lastIndexOf('}'));
-      const meaningfulLines = mainBody.filter(l => l !== '' && l !== 'return 0;' && !l.startsWith('//'));
-
-      const hasInput = trimmedCode.includes('cin >>');
-      const hasOutput = trimmedCode.includes('cout <<');
-      const hasLoop = trimmedCode.includes('for (') || trimmedCode.includes('while (');
-      const hasCondition = trimmedCode.includes('if (');
-      const hasLogic = trimmedCode.includes('sort(') || trimmedCode.includes('swap(') || trimmedCode.includes('+') || trimmedCode.includes('-') || trimmedCode.includes('*') || trimmedCode.includes('/');
-
-      const hasCustomCode = meaningfulLines.length >= 3 && (hasInput || hasOutput || hasLoop || hasCondition || hasLogic);
-
-      const isCorrect = hasCustomCode && Math.random() > 0.4;
-
-      if (!hasCustomCode) {
+      const codeLines = trimmedCode.split('\n').filter(l => l.trim().length > 0);
+      
+      // 检查代码是否包含基本的输入输出
+      const hasInput = trimmedCode.includes('cin >>') || trimmedCode.includes('scanf(');
+      const hasOutput = trimmedCode.includes('cout <<') || trimmedCode.includes('printf(');
+      
+      // 检查代码是否包含循环结构
+      const hasForLoop = /for\s*\(/.test(trimmedCode);
+      const hasWhileLoop = /while\s*\(/.test(trimmedCode);
+      
+      // 检查代码是否包含条件判断
+      const hasIfCondition = /if\s*\(/.test(trimmedCode);
+      
+      // 检查代码是否包含变量声明和基本运算
+      const hasVariable = /int\s+\w+/.test(trimmedCode) || /long\s+\w+/.test(trimmedCode);
+      const hasOperator = /\+\s*\w|-\s*\w|\*\s*\w|\/\s*\w/.test(trimmedCode);
+      
+      // 计算代码完整度得分
+      let completenessScore = 0;
+      if (hasInput) completenessScore += 2;
+      if (hasOutput) completenessScore += 2;
+      if (hasForLoop || hasWhileLoop) completenessScore += 3;
+      if (hasIfCondition) completenessScore += 2;
+      if (hasVariable) completenessScore += 1;
+      if (hasOperator) completenessScore += 1;
+      
+      // 统计有效代码行数
+      const meaningfulLines = codeLines.filter(l => 
+        !l.startsWith('#') && 
+        !l.startsWith('//') && 
+        !l.startsWith('using') &&
+        !l.startsWith('include') &&
+        l.length > 3
+      );
+      
+      // 判断代码是否正确
+      // 1. 必须有输入输出
+      // 2. 必须有循环或条件判断（大多数算法题需要）
+      // 3. 代码行数要合理（至少5行有效代码）
+      const hasValidStructure = hasInput && hasOutput;
+      const hasAlgorithmLogic = hasForLoop || hasWhileLoop || hasIfCondition;
+      const hasEnoughCode = meaningfulLines.length >= 5;
+      
+      const isCorrect = hasValidStructure && hasAlgorithmLogic && hasEnoughCode;
+      
+      if (!hasValidStructure) {
         setStatus('wrong_answer');
-        setOutput('答案错误！\n\n测试用例1: 失败\n测试用例2: 失败\n测试用例3: 失败\n\n原因: 代码没有实现有效的逻辑，请完成题目要求的功能。');
-
+        setOutput('编译错误！\n\n错误: 缺少必要的输入输出语句\n\n请确保代码包含 cin >> 和 cout << 语句');
+        
         const kpId = problem!.knowledgePoints[0];
         const aiResponse = getAIResponse('wrong_answer', kpId) || getGenericAIResponse('wrong_answer');
-
+        
         addMistake(
           problem!.id,
           code,
           'wrong_answer',
-          aiResponse?.analysis.rootCause || '代码缺少核心逻辑实现，请根据题目要求编写代码。'
+          aiResponse?.analysis.rootCause || '代码缺少必要的输入输出语句，请检查代码是否完整。'
+        );
+      } else if (!hasAlgorithmLogic) {
+        setStatus('wrong_answer');
+        setOutput('答案错误！\n\n测试用例1: 失败\n测试用例2: 失败\n测试用例3: 失败\n\n原因: 代码缺少算法逻辑实现');
+        
+        const kpId = problem!.knowledgePoints[0];
+        const aiResponse = getAIResponse('wrong_answer', kpId) || getGenericAIResponse('wrong_answer');
+        
+        addMistake(
+          problem!.id,
+          code,
+          'wrong_answer',
+          aiResponse?.analysis.rootCause || '代码缺少必要的循环或条件判断语句。'
+        );
+      } else if (!hasEnoughCode) {
+        setStatus('wrong_answer');
+        setOutput('答案错误！\n\n测试用例1: 失败\n测试用例2: 失败\n测试用例3: 失败\n\n原因: 代码实现不完整，请确保完成所有功能');
+        
+        const kpId = problem!.knowledgePoints[0];
+        const aiResponse = getAIResponse('wrong_answer', kpId) || getGenericAIResponse('wrong_answer');
+        
+        addMistake(
+          problem!.id,
+          code,
+          'wrong_answer',
+          aiResponse?.analysis.rootCause || '代码实现不完整，请完成题目要求的所有功能。'
         );
       } else if (isCorrect) {
         setStatus('accepted');
         setOutput('所有测试用例通过！\n\n测试用例1: 通过\n测试用例2: 通过\n测试用例3: 通过');
-
+        
         addProblemRecord({
           problemId: problem!.id,
           completedAt: new Date().toISOString(),
@@ -140,23 +196,17 @@ export const ProblemPage = () => {
           memoryUsage: Math.floor(Math.random() * 5000) + 10000,
         });
       } else {
-        const errorType = Math.random() > 0.5 ? 'wrong_answer' : 'runtime_error';
-        setStatus(errorType === 'wrong_answer' ? 'wrong_answer' : 'runtime_error');
-
-        if (errorType === 'wrong_answer') {
-          setOutput('答案错误！\n\n测试用例1: 通过\n测试用例2: 失败\n期望输出: 10\n实际输出: 8');
-        } else {
-          setOutput('运行时错误！\n\n程序在执行过程中崩溃，请检查数组越界、空指针等问题。');
-        }
-
+        setStatus('wrong_answer');
+        setOutput('答案错误！\n\n测试用例1: 失败\n测试用例2: 失败\n测试用例3: 失败\n\n请检查算法逻辑是否正确');
+        
         const kpId = problem!.knowledgePoints[0];
-        const aiResponse = getAIResponse(errorType, kpId) || getGenericAIResponse(errorType);
-
+        const aiResponse = getAIResponse('wrong_answer', kpId) || getGenericAIResponse('wrong_answer');
+        
         addMistake(
           problem!.id,
           code,
-          errorType,
-          aiResponse?.analysis.rootCause || '代码存在错误，请检查逻辑。'
+          'wrong_answer',
+          aiResponse?.analysis.rootCause || '代码逻辑可能有误，请仔细检查算法实现。'
         );
       }
     }, 1500);
