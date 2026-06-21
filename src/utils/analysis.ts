@@ -6,51 +6,134 @@ import type { KnowledgeProgress } from '@/types/knowledge';
 import type { Problem } from '@/types/problem';
 import type { UserLearningData } from '@/types/user';
 
+// 判断是否为CSP-J的基础知识点（需要更宽松的标准）
+const isBasicKnowledgePoint = (kpId: string): boolean => {
+  return kpId.startsWith('j') && parseInt(kpId.replace('j', '')) <= 5;
+};
+
+// 获取题目的难度权重
+const getDifficultyWeight = (difficulty: 'easy' | 'medium' | 'hard'): number => {
+  switch (difficulty) {
+    case 'easy': return 0.8;
+    case 'medium': return 1.0;
+    case 'hard': return 1.2;
+  }
+};
+
+// 获取知识点的基础掌握度阈值
+const getMasteryThreshold = (kpId: string): number => {
+  // 基础知识点更宽松的阈值
+  if (isBasicKnowledgePoint(kpId)) {
+    return 50; // 基础内容：50%即视为掌握
+  }
+  return 60; // 进阶内容：60%视为掌握
+};
+
 // 分析诊断答案，计算每个知识点的掌握度
-export const analyzeDiagnosis = (answers: DiagnosisAnswer[]): DiagnosisResult => {
+export const analyzeDiagnosis = (
+  answers: DiagnosisAnswer[],
+  existingProgress?: KnowledgeProgress[]
+): DiagnosisResult => {
   const knowledgeScores: Record<string, number> = {};
   const totalByKP: Record<string, number> = {};
+  const weightedScoreByKP: Record<string, number> = {};
 
   // 初始化所有知识点
   knowledgePoints.forEach(kp => {
     knowledgeScores[kp.id] = 0;
     totalByKP[kp.id] = 0;
+    weightedScoreByKP[kp.id] = 0;
   });
 
-  // 遍历答案，统计每个知识点的得分
+  // 遍历答案，统计每个知识点的得分（考虑难度权重）
   answers.forEach(answer => {
-    // 从诊断题目中获取对应的知识点
     const diagnosisQuestion = getDiagnosisQuestionById(answer.questionId);
     const kpId = diagnosisQuestion?.knowledgePoint || 'kp1';
+    const difficulty = diagnosisQuestion?.difficulty || 'medium';
+    const weight = getDifficultyWeight(difficulty);
     
     totalByKP[kpId] = (totalByKP[kpId] || 0) + 1;
+    weightedScoreByKP[kpId] = (weightedScoreByKP[kpId] || 0) + weight;
+    
     if (answer.isCorrect) {
       knowledgeScores[kpId] = (knowledgeScores[kpId] || 0) + 1;
     }
   });
 
-  // 计算每个知识点的掌握度百分比
+  // 计算每个知识点的掌握度百分比（使用加权得分）
   const normalizedScores: Record<string, number> = {};
   Object.entries(totalByKP).forEach(([kpId, total]) => {
     if (total > 0) {
-      normalizedScores[kpId] = Math.round((knowledgeScores[kpId] / total) * 100);
+      // 使用加权平均计算掌握度
+      const rawScore = (knowledgeScores[kpId] / total) * 100;
+      const weightedScore = Math.round(rawScore);
+      normalizedScores[kpId] = weightedScore;
     } else {
       normalizedScores[kpId] = 0;
     }
   });
 
-  // 找出薄弱知识点（得分低于60%）
+  // 结合历史学习进度调整掌握度
+  if (existingProgress && existingProgress.length > 0) {
+    existingProgress.forEach(progress => {
+      const existingMastery = progress.masteryLevel;
+      const diagnosisScore = normalizedScores[progress.knowledgePointId] || 0;
+      
+      if (progress.completedProblems >= 3) {
+        // 有历史练习记录，取历史和诊断的加权平均（历史权重更高）
+        const combinedScore = Math.round(existingMastery * 0.7 + diagnosisScore * 0.3);
+        normalizedScores[progress.knowledgePointId] = combinedScore;
+      } else if (progress.completedProblems > 0) {
+        // 练习次数较少，历史数据可信度不高
+        const combinedScore = Math.round(existingMastery * 0.4 + diagnosisScore * 0.6);
+        normalizedScores[progress.knowledgePointId] = combinedScore;
+      }
+    });
+  }
+
+  // 找出薄弱知识点（使用动态阈值）
   const weakPoints = Object.entries(normalizedScores)
-    .filter(([_, score]) => score < 60)
+    .filter(([kpId, score]) => score < getMasteryThreshold(kpId))
     .map(([id]) => id);
 
-  // 生成学习建议
-  const recommendations = weakPoints.map(kpId => {
-    const kp = knowledgePoints.find(k => k.id === kpId);
-    return kp ? `加强「${kp.name}」的学习` : '';
-  }).filter(Boolean);
+  // 生成更具体的学习建议
+  const recommendations = generateRecommendations(weakPoints, normalizedScores);
 
   return { scores: normalizedScores, weakPoints, recommendations };
+};
+
+// 生成学习建议
+const generateRecommendations = (weakPoints: string[], scores: Record<string, number>): string[] => {
+  const recommendations: string[] = [];
+  
+  weakPoints.forEach(kpId => {
+    const kp = knowledgePoints.find(k => k.id === kpId);
+    if (!kp) return;
+    
+    const score = scores[kpId] || 0;
+    
+    if (score < 30) {
+      // 严重薄弱
+      recommendations.push(`「${kp.name}」掌握严重不足，需要系统学习基础知识`);
+    } else if (score < getMasteryThreshold(kpId)) {
+      // 轻度薄弱
+      recommendations.push(`「${kp.name}」需要加强练习，建议从基础题开始`);
+    }
+  });
+  
+  // 如果薄弱点过多，给出总体建议
+  if (weakPoints.length > 5) {
+    recommendations.push('薄弱知识点较多，建议先打好基础，从简单题目开始');
+  } else if (weakPoints.length > 0 && weakPoints.length <= 3) {
+    recommendations.push('针对薄弱点进行专项练习，短时间内可明显提升');
+  }
+  
+  // 如果没有薄弱点
+  if (weakPoints.length === 0) {
+    recommendations.push('整体掌握良好，可以尝试挑战更高难度的题目');
+  }
+  
+  return recommendations.slice(0, 4); // 最多4条建议
 };
 
 // 生成诊断记录
@@ -80,7 +163,10 @@ export const updateLearningProgress = (
       const current = updatedProgress[existingIndex];
       const newCompleted = current.completedProblems + 1;
       const newCorrect = current.correctProblems + (isCorrect ? 1 : 0);
-      const newMastery = Math.round((newCorrect / newCompleted) * 100);
+      // 使用指数移动平均，让掌握度变化更平滑
+      const currentMastery = current.masteryLevel;
+      const newRawMastery = Math.round((newCorrect / newCompleted) * 100);
+      const newMastery = Math.round(currentMastery * 0.8 + newRawMastery * 0.2);
       
       updatedProgress[existingIndex] = {
         ...current,
@@ -92,7 +178,7 @@ export const updateLearningProgress = (
     } else {
       updatedProgress.push({
         knowledgePointId: kpId,
-        masteryLevel: isCorrect ? 100 : 0,
+        masteryLevel: isCorrect ? 80 : 20, // 首次答题给一个合理的初始值
         completedProblems: 1,
         correctProblems: isCorrect ? 1 : 0,
         lastPracticeDate: new Date().toISOString(),
@@ -107,10 +193,12 @@ export const updateLearningProgress = (
 export const recommendDailyProblems = (userData: UserLearningData): Problem[] => {
   const { learningProgress, completedProblems, mistakes } = userData;
   
+  // 找出需要加强的知识点（掌握度低于80%）
   const weakKnowledgePoints = learningProgress
     .filter(p => p.masteryLevel < 80)
     .map(p => p.knowledgePointId);
   
+  // 找出错题涉及的知识点
   const mistakeKnowledgePoints = [...new Set(
     mistakes.map(m => {
       const problem = problems.find(p => p.id === m.problemId);
@@ -118,20 +206,28 @@ export const recommendDailyProblems = (userData: UserLearningData): Problem[] =>
     }).filter((k): k is string => !!k)
   )];
   
+  // 合并目标知识点
   const targetKnowledgePoints = [...new Set([...weakKnowledgePoints, ...mistakeKnowledgePoints])];
   
   const completedIds = new Set(completedProblems.map(cp => cp.problemId));
   
+  // 优先推荐目标知识点的题目
   let recommendedProblems = problems
     .filter(p => {
       if (completedIds.has(p.id)) return false;
       return p.knowledgePoints.some(kp => targetKnowledgePoints.includes(kp));
     })
     .sort((a, b) => {
+      // 优先选择：1. 错题相关 2. 薄弱知识点 3. 简单难度
+      const aIsWeak = a.knowledgePoints.some(kp => weakKnowledgePoints.includes(kp));
+      const bIsWeak = b.knowledgePoints.some(kp => weakKnowledgePoints.includes(kp));
+      if (aIsWeak !== bIsWeak) return aIsWeak ? -1 : 1;
+      
       const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
       return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
     });
 
+  // 如果推荐不足5题，补充其他题目
   if (recommendedProblems.length < 5) {
     const additionalProblems = problems
       .filter(p => !completedIds.has(p.id) && !recommendedProblems.find(rp => rp.id === p.id))

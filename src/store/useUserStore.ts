@@ -63,7 +63,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
   
   completeDiagnosis: (level: 'CSP-J' | 'CSP-S', answers: DiagnosisAnswer[]): DiagnosisRecord | null => {
-    const result = analyzeDiagnosis(answers);
+    const existingProgress = get().userData.learningProgress;
+    const result = analyzeDiagnosis(answers, existingProgress);
     const record = generateDiagnosisRecord(level, result);
     
     // 获取学习路径
