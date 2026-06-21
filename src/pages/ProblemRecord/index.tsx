@@ -2,8 +2,8 @@ import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { problemList } from '@/data/problemList';
 import { useUserStore } from '@/store/useUserStore';
-import { motion } from 'framer-motion';
-import { BookOpen, Calendar, Check, Clock, ExternalLink, Filter, Search, SortAsc, SortDesc, Trash2, Trophy, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertTriangle, BookOpen, Calendar, Check, Clock, ExternalLink, Filter, Search, SortAsc, SortDesc, Trash2, Trophy, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -31,6 +31,7 @@ export const ProblemRecord = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [filterDifficulty, setFilterDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
   const [filterPlatform, setFilterPlatform] = useState<string>('all');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ problemId: string; title: string } | null>(null);
   
   // 根据平台获取题目链接
   const getProblemLink = (platform: string, problemId: string): string => {
@@ -93,8 +94,19 @@ export const ProblemRecord = () => {
   const mediumCount = completedProblemsWithDetails.filter(cp => cp.detail?.difficulty === 'medium').length;
   const hardCount = completedProblemsWithDetails.filter(cp => cp.detail?.difficulty === 'hard').length;
   
-  const handleDelete = (problemId: string) => {
-    clearCompletedProblem(problemId);
+  const handleDeleteClick = (problemId: string, title: string) => {
+    setDeleteConfirm({ problemId, title });
+  };
+  
+  const handleDeleteConfirm = () => {
+    if (deleteConfirm) {
+      clearCompletedProblem(deleteConfirm.problemId);
+      setDeleteConfirm(null);
+    }
+  };
+  
+  const handleDeleteCancel = () => {
+    setDeleteConfirm(null);
   };
   
   return (
@@ -350,7 +362,7 @@ export const ProblemRecord = () => {
                       </motion.a>
                       
                       <motion.button
-                        onClick={() => handleDelete(cp.problemId)}
+                        onClick={() => handleDeleteClick(cp.problemId, detail.title)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         className="p-2 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-all"
@@ -387,6 +399,60 @@ export const ProblemRecord = () => {
           )}
         </Card>
       </motion.div>
+      
+      {/* 删除确认弹窗 */}
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            onClick={handleDeleteCancel}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle size={24} className="text-red-500" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-neutral-800">确认删除</h3>
+                  <p className="text-sm text-neutral-500">此操作无法撤销</p>
+                </div>
+              </div>
+              
+              <p className="text-neutral-600 mb-6">
+                确定要删除题目 <span className="font-medium text-neutral-800">"{deleteConfirm.title}"</span> 的做题记录吗？
+              </p>
+              
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleDeleteCancel}
+                  className="flex-1 py-2.5 rounded-xl border border-neutral-200 text-neutral-600 font-medium hover:bg-neutral-50 transition-all"
+                >
+                  取消
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleDeleteConfirm}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-all"
+                >
+                  确认删除
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

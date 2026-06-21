@@ -3,7 +3,7 @@ import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { ProgressBar } from '@/components/common/ProgressBar';
 import { knowledgePoints } from '@/data/knowledgePoints';
-import { getRecommendedProblemsByWeakPoints } from '@/data/problemList';
+import { calculateKnowledgeMasteryFromRecords, getRecommendedProblemsByWeakPoints } from '@/data/problemList';
 import { useUserStore } from '@/store/useUserStore';
 import { getKnowledgePointName, getMasteryColor } from '@/utils/analysis';
 import { motion } from 'framer-motion';
@@ -73,12 +73,18 @@ export const DiagnosisReport = () => {
     );
   }
   
-  // 雷达图显示所有诊断涉及的知识点（包括0分的），按知识点ID排序保证顺序一致
-  const radarData = Object.entries(diagnosis.scores)
-    .map(([kpId, score]) => ({
+  // 雷达图数据：根据用户做题记录计算各知识点掌握度
+  const completedProblemIds = userData.completedProblems.map(p => p.problemId);
+  const masteryFromRecords = calculateKnowledgeMasteryFromRecords(completedProblemIds);
+  
+  // 根据诊断的知识点范围筛选雷达图数据
+  const diagnosisKPIds = Object.keys(diagnosis.scores);
+  const radarData = diagnosisKPIds
+    .map(kpId => ({
       name: getKnowledgePointName(kpId),
-      value: score,
+      value: masteryFromRecords[kpId] || 0,
     }))
+    .filter(item => item.name !== '未知知识点')
     .sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
   
   const sortedKP = Object.entries(diagnosis.scores)

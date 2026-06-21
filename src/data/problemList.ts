@@ -313,3 +313,57 @@ export const getAllCategories = (): string[] => {
 export const getProblemsByCategory = (category: string): ProblemItem[] => {
   return problemList.filter(p => p.category === category);
 };
+
+// 反向映射：从题目分类获取知识点ID
+export const categoryToKnowledge: Record<string, string[]> = {};
+Object.entries(knowledgeToCategory).forEach(([kpId, categories]) => {
+  categories.forEach(cat => {
+    if (!categoryToKnowledge[cat]) {
+      categoryToKnowledge[cat] = [];
+    }
+    categoryToKnowledge[cat].push(kpId);
+  });
+});
+
+// 根据做题记录计算各知识点的掌握度
+export const calculateKnowledgeMasteryFromRecords = (
+  completedProblemIds: string[]
+): Record<string, number> => {
+  const mastery: Record<string, number> = {};
+  
+  // 初始化所有知识点为0
+  knowledgePoints.forEach(kp => {
+    mastery[kp.id] = 0;
+  });
+  
+  // 统计每个知识点对应的题目总数和已完成数
+  const kpStats: Record<string, { total: number; completed: number }> = {};
+  
+  knowledgePoints.forEach(kp => {
+    const categories = knowledgeToCategory[kp.id] || [];
+    const totalProblems = problemList.filter(p => categories.includes(p.category)).length;
+    kpStats[kp.id] = { total: totalProblems, completed: 0 };
+  });
+  
+  // 计算已完成的题目对应的知识点
+  completedProblemIds.forEach(problemId => {
+    const problem = problemList.find(p => p.id === problemId);
+    if (problem) {
+      const kpIds = categoryToKnowledge[problem.category] || [];
+      kpIds.forEach(kpId => {
+        if (kpStats[kpId]) {
+          kpStats[kpId].completed++;
+        }
+      });
+    }
+  });
+  
+  // 计算掌握度百分比（已完成/总数 * 100，上限100）
+  Object.entries(kpStats).forEach(([kpId, stats]) => {
+    if (stats.total > 0) {
+      mastery[kpId] = Math.min(100, Math.round((stats.completed / stats.total) * 100));
+    }
+  });
+  
+  return mastery;
+};
